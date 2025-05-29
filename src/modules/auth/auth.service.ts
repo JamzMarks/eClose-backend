@@ -18,11 +18,10 @@ export class AuthService {
 
 
     async signIn(email: string, password: string): Promise<AuthResponseDto>{
-        const user =  this.userService.findUserByEmail(email)
+        const user =  await this.userService.findUserByEmail(email)
         if(!user || compareSync(password, user.password) === false){
             throw new UnauthorizedException('Invalid credentials');
         }
-
         const payload = {
             sub: user.id,
             email: user.email

@@ -10,6 +10,6 @@ export class AuthController {
     @HttpCode(HttpStatus.OK)
     @Post('login')
     async login(@Body() user: any ): Promise<any> {
-        return this.authService.signIn(user.email, user.password);
+        return await this.authService.signIn(user.email, user.password);
     }
 }

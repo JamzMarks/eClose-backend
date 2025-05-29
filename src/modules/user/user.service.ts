@@ -1,48 +1,52 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { User } from "./user.entity";
 import { CreateUserDto, UserDto } from "./user.dto";
-import { v4 as uuid } from 'uuid';
 import { hashSync } from "bcrypt";
-
-const users: User[] = [
-    { id: '1', name: 'John Doe', email: "teste1", password: 'aaaaaabb' },
-    { id: '2', name: 'Jane Smith', email: "teste2", password: 'aaaaaabb' },
-    { id: '3', name: 'Alice Johnson', email: "teste3", password: 'aaaaaabb' }  
-]
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
 
 @Injectable()
 export class UserService {
-    getUsers(): User[] {
-        return users;
+    constructor(
+        @InjectRepository(User)
+        private readonly repo: Repository<User>,
+    ) {}
+
+    async findAll(): Promise<User[]> {
+        return await this.repo.find();
     }
 
-    getUserById(id: string): User | null {
-        const user = users.find(user => user.id === id);
-        return user ? user : null;
+    async findUserById(id: string): Promise<User | null> {
+        return await this.repo.findOne({ where: { id } });
     }
 
-    findUserByEmail(email: string): User | null {
-        const user = users.find(user => user.email === email);
-        return user ? user : null;
+    async findUserByEmail(email: string): Promise<User | null> {
+        return await this.repo.findOne({ where: { email }});  
     }
 
-    createUser(user: CreateUserDto): UserDto {
-        const newUser: User = {
-            id: uuid(),
+    async createUser(user: CreateUserDto): Promise<User> {
+         const newUser = this.repo.create({
             name: user.name,
             email: user.email,
-            password: hashSync(user.password, 10)
+            password: hashSync(user.password, 10),
+        });
+        return await this.repo.save(newUser);
+    }
+
+    async updateUser(id: string, user: Partial<CreateUserDto>): Promise<User> {
+        const existingUser = await this.repo.findOne({ where: { id } });
+        if (!existingUser) {
+            throw new NotFoundException(`User with ID ${id} not found`);
         }
-        users.push(newUser)
+        const updatedUser = Object.assign(existingUser, user);
 
-        return newUser;
+        return this.repo.save(updatedUser)
     }
 
-    updateUser(id: string, name: string): string {
-        return `User with ID: ${id} updated to ${name}`;
-    }
-
-    deleteUser(id: string): string {
-        return `User with ID: ${id} deleted`;
+    async deleteUser(id: string): Promise<void> {
+        const result = await this.repo.delete(id);
+        if (result.affected === 0) {
+            throw new NotFoundException(`User with ID: ${id} not found`);
+        }
     }
 }

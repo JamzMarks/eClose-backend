@@ -1,47 +1,39 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { Event } from "./event.entity";
+import { Repository } from "typeorm";
+import { InjectRepository } from "@nestjs/typeorm";
 
 @Injectable()   
 export class EventService {
+    constructor(
+        @InjectRepository(Event)
+        private readonly eventRepository: Repository<Event>
+    ) {}
 
-    getEvents(): Event[]{
-        return [
-            {
-                id: 1,
-                name: "Tech Conference",
-                date: new Date("2023-10-01"),
-                location: "San Francisco",
-                description: "A conference about the latest in tech.",
-                organizer: "Tech Corp"
-            },
-            {
-                id: 2,
-                name: "Music Festival",
-                date: new Date("2023-11-15"),
-                location: "Los Angeles",
-                description: "A festival featuring various music artists.",
-                organizer: "Music Inc"
-            }
-        ];
+    async findAll(): Promise<Event[]> {
+        return await this.eventRepository.find();
     }
-    getEventById(id: number): Event {
-        return {
-            id: id,
-            name: "Sample Event",
-            date: new Date("2023-12-01"),
-            location: "New York",
-            description: "A sample event for demonstration purposes.",
-            organizer: "Sample Organizer"
-        };
+    async findEventById(id: number): Promise<Event | null> {
+        return await this.eventRepository.findOne({ where: { id } })
     }
-    createEvent(event: Event): string {
-        return `Event ${event.name} created successfully`;
+    async createEvent(event: Event): Promise<Event> {
+        const newEvent = this.eventRepository.create(event);
+        return await this.eventRepository.save(newEvent);
     }
-    updateEvent(id: number, event: Event): string {
-        return `Event with ID: ${id} updated successfully`;
+    async updateEvent(id: number, event: Partial<Event>): Promise<Event> {
+        const existingEvent = await this.eventRepository.findOne({ where: { id } });
+        if (!existingEvent) {
+            throw new NotFoundException(`Event with ID ${id} not found`);
+        }
+        const updatedEvent = Object.assign(existingEvent, event);
+        return this.eventRepository.save(updatedEvent);
     }
-    deleteEvent(id: number): string {
-        return `Event with ID: ${id} deleted successfully`;
+    async deleteEvent(id: number): Promise<void> {
+        const result = await this.eventRepository.delete(id);
+        if (result.affected === 0) {
+            throw new NotFoundException(`User with ID: ${id} not found`);
+        }
     }
 
 }
+

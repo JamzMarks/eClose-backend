@@ -7,12 +7,13 @@ export class EventController{
     constructor(private readonly eventService: EventService){}
 
     @Get()
-    getEvents(): Event[] {
-        return this.eventService.getEvents();
+    getEvents():Promise<Event[]> {
+        return this.eventService.findAll();
     }
+    
     @Get(':id')
-    getEventById(id: number): Event {
-        return this.eventService.getEventById(id);
+    getEventById(id: number): Promise< Event | null> {
+        return this.eventService.findEventById(id);
     }
 
 }
