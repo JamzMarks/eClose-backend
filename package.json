@@ -6,11 +6,12 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-
     "start:gateway": "ts-node src/modules/gateway-api/src/main.ts",
     "start:user": "ts-node src/modules/user-ms/src/main.ts",
     "start:auth": "ts-node src/modules/auth-ms/src/main.ts",
-
+    "dev:gateway": "ts-node-dev --respawn --transpile-only src/modules/gateway-api/src/main.ts",
+    "dev:user": "ts-node-dev --respawn --transpile-only src/modules/user-ms/src/main.ts",
+    "dev:auth": "ts-node-dev --respawn --transpile-only src/modules/auth-ms/src/main.ts",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
@@ -34,6 +35,8 @@
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/typeorm": "^11.0.0",
+    "amqp-connection-manager": "^4.1.14",
+    "amqplib": "^0.10.8",
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
@@ -72,6 +75,7 @@
     "ts-jest": "^29.2.5",
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.20.0"

@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { UserController } from './controllers/user.controller';
 
 @Module({
   imports: [
@@ -38,25 +39,27 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
     }),
     // EventModule,
     ClientsModule.register([
-      {
-        name: 'USER_SERVICE',
-        transport: Transport.TCP,
-        options: {
-          host: process.env.USER_SERVICE_HOST || 'localhost',
-          port: parseInt(process.env.USER_SERVICE_PORT || '3001'),
-        },
+    {
+      name: 'USER_SERVICE',
+      transport: Transport.RMQ,
+      options: {
+        urls: [process.env.RMQ_URL || 'amqp://localhost:5672'],
+        queue: 'user_queue',
+        queueOptions: { durable: true },
       },
+    },
       {
         name: 'AUTH_SERVICE',
-        transport: Transport.TCP,
+        transport: Transport.RMQ,
         options: {
-          host: process.env.AUTH_SERVICE_HOST || 'localhost',
-          port: parseInt(process.env.AUTH_SERVICE_PORT || '3002'),
+          urls: [process.env.RMQ_URL || 'amqp://localhost:5672'],
+          queue: 'auth_queue',
+          queueOptions: { durable: true },
         },
       },
     ]),
   ],
-  controllers: [AppController],
+  controllers: [AppController, UserController],
   providers: [AppService],
 })
 export class AppModule {}

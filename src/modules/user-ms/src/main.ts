@@ -4,13 +4,15 @@ import { UserModule } from './user/user.module';
 
 async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(UserModule, {
-    transport: Transport.TCP,
+    transport: Transport.RMQ,
     options: {
-      host: 'localhost',
-      port: 3001,
+      urls: ['amqp://localhost:5672'], 
+      queue: 'user_queue',
+      queueOptions: { durable: true },
     },
   });
+
   await app.listen();
-  console.log('User MS rodando na porta 3001 🚀');
+  console.log('User MS conectado ao RabbitMQ 🐇');
 }
 bootstrap();
