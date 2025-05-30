@@ -13,7 +13,11 @@ export class UserService {
     ) {}
 
     async findAll(): Promise<User[]> {
-        return await this.repo.find();
+        return await this.repo.find({
+            skip: 0,
+            take: 20,
+            order: { username: 'ASC' }
+        });
     }
 
     async findUserById(id: string): Promise<User | null> {
@@ -26,7 +30,8 @@ export class UserService {
 
     async createUser(user: CreateUserDto): Promise<User> {
          const newUser = this.repo.create({
-            name: user.name,
+            firstName: user.firstName,
+            lastName: user.lastName,
             email: user.email,
             password: hashSync(user.password, 10),
         });

@@ -1,0 +1,16 @@
+export enum MusicGenre {
+  ROCK = 'rock',
+  POP = 'pop',
+  JAZZ = 'jazz',
+  BLUES = 'blues',
+  HIPHOP = 'hiphop',
+  CLASSICAL = 'classical',
+  ELECTRONIC = 'electronic',
+  FUNK = 'funk',
+  SERTANEJO = 'sertanejo',
+  FORRO = 'forro',
+  PAGODE = 'pagode',
+  SAMBA = 'samba',
+  MPB = 'mpb',
+  OTHER = 'other',
+}

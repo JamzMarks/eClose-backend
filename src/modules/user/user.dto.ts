@@ -9,7 +9,13 @@ export class UserDto {
 export class CreateUserDto {
 
     @IsString()
-    name: string;
+    username: string;
+    
+    @IsString()
+    firstName: string;
+
+    @IsString()
+    lastName: string;
 
     @IsEmail()
     email: string;

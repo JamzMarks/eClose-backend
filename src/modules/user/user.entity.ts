@@ -6,12 +6,20 @@ export class User{
     id: string;
 
     @Column()
-    name: string;
+    firstName: string;
 
     @Column()
+    lastName: string;
+
+    @Column({ unique: true })
+    @Index()
+    username: string;
+
+    @Column({ unique: true })
+    @Index()
     email: string;
 
-    @Column()
+    @Column({ select: false })
     password: string;
 
 }
