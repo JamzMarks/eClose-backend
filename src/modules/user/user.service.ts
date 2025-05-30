@@ -32,6 +32,7 @@ export class UserService {
          const newUser = this.repo.create({
             firstName: user.firstName,
             lastName: user.lastName,
+            username: user.username,
             email: user.email,
             password: hashSync(user.password, 10),
         });
