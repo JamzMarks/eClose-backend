@@ -2,7 +2,6 @@ import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Venue {
-    // Identificador único
     @PrimaryGeneratedColumn('uuid')
     id: string;
 

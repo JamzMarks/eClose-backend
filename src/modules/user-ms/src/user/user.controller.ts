@@ -1,7 +1,9 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post } from "@nestjs/common";
+import { User } from "../types/user.entity";
 import { UserService } from "./user.service";
-import { User } from "./user.entity";
-import { CreateUserDto, UserDto } from "./user.dto";
+import { CreateUserDto, UserDto } from "../types/user.dto";
+import { MessagePattern } from "@nestjs/microservices";
+
 
 @Controller('user')
 export class UserController {
@@ -12,6 +14,11 @@ export class UserController {
         return this.userService.findAll();
     }
 
+    @MessagePattern({ cmd: 'get_users' })
+    testeUsers() {
+        return [{ id: 1, name: 'Fulano' }];
+    }
+    
     @Get(':id')
     findUserById(id: string): Promise<User | null> {
         return this.userService.findUserById(id);

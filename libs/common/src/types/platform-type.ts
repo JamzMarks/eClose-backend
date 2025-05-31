@@ -1,0 +1,1 @@
+export type Platform = 'youtube' | 'zoom' | 'google_meet' | 'teams' | 'instagram' | 'other';

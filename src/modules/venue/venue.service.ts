@@ -11,8 +11,13 @@ export class VenueService {
     async findAll(): Promise<Venue[]> {
         return await this.venueRepository.find();
     }
-    
+
     async findVenueById(id: string): Promise<Venue | null> {
         return await this.venueRepository.findOne({where: {id}})
+    }
+
+    async createVenue(venue: Venue): Promise<Venue> {
+        const newVenue = this.venueRepository.create(venue);
+        return await this.venueRepository.save(newVenue);
     }
 }
