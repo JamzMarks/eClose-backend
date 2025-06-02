@@ -9,28 +9,24 @@ import { MessagePattern } from "@nestjs/microservices";
 export class UserController {
     constructor(private readonly userService: UserService){}
 
-    @Get()
+    @MessagePattern({ cmd: 'find_users' })
     getUsers(): Promise<User[]>{
         return this.userService.findAll();
     }
-
-    @MessagePattern({ cmd: 'get_users' })
-    testeUsers() {
-        return [{ id: 1, name: 'Fulano' }];
-    }
     
-    @Get(':id')
+    @MessagePattern({ cmd: 'find_users_by_id' })
     findUserById(id: string): Promise<User | null> {
         return this.userService.findUserById(id);
     }
 
-    @Get('email/:email')
+    @MessagePattern({ cmd: 'find_users_by_email' })
     findUserByEmail(email: string): Promise<User | null> {
         return this.userService.findUserByEmail(email);
     }
-    
-    @Post()
+
+    @MessagePattern({ cmd: 'create_user' })
     createUser(@Body() user: CreateUserDto): Promise<User> {
+        console.log('createUser', user);
         return this.userService.createUser(user);
     }
 

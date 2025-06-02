@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { AppService } from './services/app.service';
 // import { EventModule } from './modules/events/event.module';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { UserController } from './controllers/user.controller';
+import { AppController } from './controllers/app.controller';
 
 @Module({
   imports: [

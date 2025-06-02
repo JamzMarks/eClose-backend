@@ -32,8 +32,7 @@ export class UserService {
     async createUser(user: CreateUserDto): Promise<User> {
         console.log(user);
          const newUser = this.repo.create({
-            firstName: user.firstName,
-            lastName: user.lastName,
+            name: user.name,
             username: user.username,
             email: user.email,
             password: hashSync(user.password, 10),
