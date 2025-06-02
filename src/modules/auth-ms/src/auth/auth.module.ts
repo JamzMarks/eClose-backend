@@ -2,8 +2,8 @@ import { Module } from "@nestjs/common";
 import { AuthController } from "./auth.controller";
 import { JwtModule } from "@nestjs/jwt";
 import { ConfigModule, ConfigService } from "@nestjs/config";
-import { AuthService } from "./auth.service";
-import { UserClientService } from "./user-client.service";
+import { AuthService } from "./services/auth.service";
+import { UserClientService } from "./services/user-client.service";
 import { HttpModule } from "@nestjs/axios";
 
 @Module({

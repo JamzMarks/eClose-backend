@@ -12,10 +12,7 @@ export class CreateUserDto {
     username: string;
     
     @IsString()
-    firstName: string;
-
-    @IsString()
-    lastName: string;
+    name: string;
 
     @IsEmail()
     email: string;
