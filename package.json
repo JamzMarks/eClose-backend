@@ -6,24 +6,24 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "start:gateway": "ts-node src/modules/gateway-api/src/main.ts",
-    "start:user": "ts-node src/modules/user-ms/src/main.ts",
-    "start:auth": "ts-node src/modules/auth-ms/src/main.ts",
-    "dev:gateway": "ts-node-dev --respawn --transpile-only src/modules/gateway-api/src/main.ts",
-    "dev:user": "ts-node-dev --respawn --transpile-only src/modules/user-ms/src/main.ts",
-    "dev:auth": "ts-node-dev --respawn --transpile-only src/modules/auth-ms/src/main.ts",
+    "start:gateway": "ts-node apps/api/src/main.ts",
+    "start:user": "ts-node apps/users/src/main.ts",
+    "start:auth": "ts-node apps/auth/src/main.ts",
+    "dev:gateway": "ts-node-dev --respawn --transpile-only apps/api/src/main.ts",
+    "dev:user": "ts-node-dev --respawn --transpile-only apps/users/src/main.ts",
+    "dev:auth": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register apps/auth/src/main.ts",
     "build": "nest build",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"libs/**/*.ts\"",
+    "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
+    "start:prod": "node dist/apps/e-close/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./apps/e-close/test/jest-e2e.json"
   },
   "dependencies": {
     "@nestjs/axios": "^4.0.0",
@@ -97,10 +97,12 @@
     "coverageDirectory": "./coverage",
     "testEnvironment": "node",
     "roots": [
-      "<rootDir>/src/",
-      "<rootDir>/libs/"
+      "<rootDir>/libs/",
+      "<rootDir>/apps/"
     ],
     "moduleNameMapper": {
+      "^@app/@common(|/.*)$": "<rootDir>/libs/@common/src/$1",
+      "^@app/common(|/.*)$": "<rootDir>/libs/common/src/$1",
       "^@common/common(|/.*)$": "<rootDir>/libs/common/src/$1"
     }
   }
