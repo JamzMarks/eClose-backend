@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { AuthService } from "./services/auth.service";
 import { UserClientService } from "./services/user-client.service";
 import { HttpModule } from "@nestjs/axios";
+import { ClientsModule, Transport } from "@nestjs/microservices";
 
 @Module({
     imports: [
@@ -21,6 +22,16 @@ import { HttpModule } from "@nestjs/axios";
             }),
             inject: [ConfigService],
         }),
+         ClientsModule.register([
+            {
+              name: 'USER_SERVICE',
+              transport: Transport.RMQ,
+              options: {
+                urls: [process.env.RMQ_URL || 'amqp://localhost:5672'],
+                queue: 'user_queue',
+                queueOptions: { durable: true },
+              },
+            }]),
         HttpModule
     ],
     controllers: [AuthController],

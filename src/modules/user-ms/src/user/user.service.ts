@@ -29,6 +29,10 @@ export class UserService {
         return await this.repo.findOne({ where: { email }});  
     }
 
+    async findUserByUsername(username: string): Promise<User | null> {
+        return await this.repo.findOne({ where: { username } });
+    }
+
     async createUser(user: CreateUserDto): Promise<User> {
         console.log(user);
          const newUser = this.repo.create({

@@ -24,6 +24,11 @@ export class UserController {
         return this.userService.findUserByEmail(email);
     }
 
+    @MessagePattern({ cmd: 'find_users_by_username' })
+    findUserByUsername(username: string): Promise<User | null> {
+        return this.userService.findUserByUsername(username);
+    }
+
     @MessagePattern({ cmd: 'create_user' })
     createUser(@Body() user: CreateUserDto): Promise<User> {
         console.log('createUser', user);

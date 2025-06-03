@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { UserController } from './controllers/user.controller';
 import { AppController } from './controllers/app.controller';
+import { AuthController } from './controllers/auth.controller';
 
 @Module({
   imports: [
@@ -59,7 +60,7 @@ import { AppController } from './controllers/app.controller';
       },
     ]),
   ],
-  controllers: [AppController, UserController],
+  controllers: [AppController, UserController, AuthController],
   providers: [AppService],
 })
 export class AppModule {}

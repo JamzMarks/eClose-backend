@@ -1,22 +1,22 @@
-import { HttpService } from '@nestjs/axios';
-import { Injectable} from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class UserClientService {
-  private readonly baseUrl = 'http://localhost:3002';
-  constructor(private readonly http: HttpService) {}
+  constructor(
+    @Inject('USER_SERVICE') private readonly client: ClientProxy
+  ) {}
 
   async findUserByEmail(email: string) {
-    const response = this.http.get(`${this.baseUrl}/users/email/${email}`);
-    const res = await firstValueFrom(response);
-    return res.data;
+    return await firstValueFrom(
+      this.client.send({ cmd: 'find-user-by-email' }, email)
+    );
   }
 
   async createUser(user: any) {
-    const response$ = this.http.post(`${this.baseUrl}/users`, user);
-    const res = await firstValueFrom(response$);
-    return res.data;
+    return await firstValueFrom(
+      this.client.send({ cmd: 'create-user' }, user)
+    );
   }
-
 }
