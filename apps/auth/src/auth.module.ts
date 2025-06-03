@@ -1,0 +1,45 @@
+import { Module } from "@nestjs/common";
+import { AuthController } from "./auth.controller";
+import { JwtModule } from "@nestjs/jwt";
+import { ConfigModule, ConfigService } from "@nestjs/config";
+import { AuthService } from "./services/auth.service";
+import { UserClientService } from "./services/user-client.service";
+import { HttpModule } from "@nestjs/axios";
+import { UserClientModule } from "./clients/user-client.module";
+
+@Module({
+    imports: [
+        JwtModule.registerAsync({
+            imports: [ConfigModule.forRoot({
+                isGlobal: true,
+                envFilePath: '.env',
+            }),],
+            useFactory: async (configService: ConfigService) => {
+                const secret = configService.get<string>('JWT_SECRET');
+                const expiresIn = configService.get<number>('JWT_EXPIRATION_TIME');
+                console.log(process.env.JWT_SECRET);
+                console.log('JWT_SECRET:', secret);
+                console.log('JWT_EXPIRATION_TIME:', expiresIn);
+                return {
+                    secret,
+                    signOptions: {
+                    expiresIn,
+                    },
+                };
+                },
+            // useFactory: async (configService: ConfigService) => ({
+            //     secret: configService.get<string>('JWT_SECRET'),
+            //     signOptions: {
+            //         expiresIn: configService.get<number>('JWT_EXPIRATION_TIME'),
+            //     },
+            // }),
+            inject: [ConfigService],
+        }),
+        HttpModule, UserClientModule
+    ],
+    controllers: [AuthController],
+    providers: [AuthService, UserClientService],
+    exports: [],
+})
+export class AuthModule {
+}
