@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { AuthModule } from './auth.module';
+import { GlobalRpcExceptionFilter } from '@app/common/filters/rpc-exception.filter';
 
 
 async function bootstrap() {
@@ -13,6 +14,7 @@ async function bootstrap() {
     },
   });
 
+  app.useGlobalFilters(new GlobalRpcExceptionFilter());
   await app.listen();
   console.log('Auth MS conectado ao RabbitMQ 🐇');
 }

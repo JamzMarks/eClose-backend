@@ -35,7 +35,7 @@ import { ApiService } from './api.service';
     }),
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env',
+      envFilePath: 'apps/api/.env',
     }),
     // EventModule,
     ClientsModule.register([

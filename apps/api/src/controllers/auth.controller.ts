@@ -1,5 +1,7 @@
-import { Body, Controller, Get, Inject, Post } from "@nestjs/common";
+import { LoginDto } from "@app/common/dtos/login.dto";
+import { BadRequestException, Body, Controller, HttpException, Inject, InternalServerErrorException, Post, ValidationPipe } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
+import { firstValueFrom } from "rxjs";
 
 @Controller('auth')
 export class AuthController {
@@ -8,12 +10,13 @@ export class AuthController {
     ) {}
         
     @Post('signin')
-    async AuthSignIn(@Body() body: any) {
-        return this.authClient.send({ cmd: 'sign_in' }, body).toPromise();
+    async AuthSignIn(@Body(new ValidationPipe()) body: LoginDto){
+        return await firstValueFrom(this.authClient.send({ cmd: 'sign_in' }, body));
+
     }
     
     @Post('signup')
-    async AuthSignUp() {
-        return this.authClient.send({ cmd: 'sign_up' }, {}).toPromise();
+    async AuthSignUp(@Body() body: any){
+        return await firstValueFrom(this.authClient.send({ cmd: 'sign_up' }, body));
     }
 }

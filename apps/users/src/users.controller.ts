@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Param, Patch } from "@nestjs/common";
+import { Body, Controller} from "@nestjs/common";
 import { MessagePattern } from "@nestjs/microservices";
 import { UserService } from "./users.service";
 import { User } from "./types/user.entity";
@@ -40,13 +40,14 @@ export class UserController {
         return this.userService.createUser(user);
     }
 
-    @MessagePattern({ cmd: UserCommands.DELETE })
+    
+    @MessagePattern({ cmd: UserCommands.UPDATE })
     updateUser(@Body() user: UserDto, id: string): Promise<User | null> {
         return this.userService.updateUser(id, user);
     }
 
-    @MessagePattern({ cmd: UserCommands.UPDATE })
-    deleteUser(@Param() id: string): Promise<void> {
+    @MessagePattern({ cmd: UserCommands.DELETE })
+    deleteUser(@Body() id: string): Promise<void> {
         return this.userService.deleteUser(id);
     }
 }
