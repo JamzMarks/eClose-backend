@@ -1,11 +1,11 @@
 import { ConflictException, Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import { compare, compareSync } from "bcrypt";
+import { compare } from "bcrypt";
 import { ConfigService } from "@nestjs/config";
 import { UserClientService } from "./user-client.service";
-import { JwtPayload } from "../interfaces/jwt-payload.interface";
 import { AuthResponseDto } from "../dto/auth-response.dto";
 import { CreateUserDto } from "../types/user.dto";
+import { JwtPayload } from "@app/common/contracts/auth/jwt-payload.interface";
 
 
 @Injectable()
