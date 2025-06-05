@@ -44,7 +44,12 @@ export class EventsService {
   }
 
   async createEvent(dto: CreateEventDto): Promise<Events> {
-    const newEvent = this.repo.create(dto);
+    const dateAsDate = new Date(dto.date);
+
+    const newEvent = this.repo.create({
+      ...dto,
+      date: dateAsDate,
+    });
     return await this.repo.save(newEvent);
   }
 

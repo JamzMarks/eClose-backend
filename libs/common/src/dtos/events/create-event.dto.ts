@@ -14,7 +14,7 @@ export class CreateEventDto {
 
   @IsNotEmpty()
   @IsISO8601() // aceita string no formato ISO 8601
-  date: string;
+  date: Date;
 
   @IsNotEmpty()
   @IsString()

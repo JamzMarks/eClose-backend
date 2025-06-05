@@ -8,22 +8,22 @@ export class UserController {
         @Inject('USER_SERVICE') private readonly userClient: ClientProxy) {}
 
     @Get()
-    async getUsers() {
+    async findAll() {
         return this.userClient.send({ cmd: UserCommands.FIND_ALL }, {}).toPromise();
     }
 
     @Get(':id')
-    async getUserById(@Param('id') id: string) {
+    async findUserById(@Param('id') id: string) {
         return this.userClient.send({ cmd: UserCommands.FIND_BY_ID }, id).toPromise();
     }
 
     @Get('email/:email')
-    async getUserByEmail(@Param('email') email: string) {
+    async findUserByEmail(@Param('email') email: string) {
         return this.userClient.send({ cmd: UserCommands.FIND_BY_EMAIL }, email).toPromise();
     }
 
     @Get('un/:username')
-    async getUserByUsername(@Param('username') username: string) {
+    async findUserByUsername(@Param('username') username: string) {
         return this.userClient.send({ cmd: UserCommands.FIND_BY_USERNAME }, username).toPromise();
     }
 

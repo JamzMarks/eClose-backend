@@ -1,4 +1,4 @@
-export const EventCommands = {
+export const EventsCommands = {
   // Busca
   FIND_ALL: 'find_all_events',
   FIND_BY_ID: 'find_event_by_id',

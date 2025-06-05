@@ -10,13 +10,13 @@ export class AuthController {
     ) {}
         
     @Post('signin')
-    async AuthSignIn(@Body(new ValidationPipe()) body: LoginDto){
+    async authSignIn(@Body() body: LoginDto){
         return await firstValueFrom(this.authClient.send({ cmd: 'sign_in' }, body));
 
     }
     
     @Post('signup')
-    async AuthSignUp(@Body(new ValidationPipe()) body: any){
+    async authSignUp(@Body() body: any){
         return await firstValueFrom(this.authClient.send({ cmd: 'sign_up' }, body));
     }
 }

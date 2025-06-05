@@ -24,6 +24,6 @@ import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
     @Column()
     organizerType: string;
 
-    @Column({nullable: true})
-    admins: string[];
+    @Column({ nullable: true, type: 'text' })
+      admins: string[];
  }

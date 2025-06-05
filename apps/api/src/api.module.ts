@@ -6,11 +6,12 @@ import { UserController } from './controllers/user.controller';
 import { AuthController } from './controllers/auth.controller';
 import { ApiController } from './api.controller';
 import { ApiService } from './api.service';
+import { EventsController } from './controllers/events.controller';
 
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
-      useFactory: () => {
+      useFactory: () => { 
         const isProd = process.env.NODE_ENV === 'production';
         return isProd
           ? {
@@ -57,9 +58,18 @@ import { ApiService } from './api.service';
           queueOptions: { durable: true },
         },
       },
+      {
+        name: 'EVENTS_SERVICE',
+        transport: Transport.RMQ,
+        options: {
+          urls: [process.env.RMQ_URL || 'amqp://localhost:5672'],
+          queue: 'events_queue',
+          queueOptions: { durable: true },
+        },
+      },
     ]),
   ],
-  controllers: [ApiController, UserController, AuthController],
+  controllers: [ApiController, UserController, AuthController, EventsController],
   providers: [ApiService],
 })
 export class ApiModule {}
