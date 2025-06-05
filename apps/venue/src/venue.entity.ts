@@ -9,11 +9,11 @@ export class Venue {
     @Column({ length: 255 })
     name: string;
 
-    @Column({ type: 'text' })
-    description: string;
+    @Column({ type: 'text', nullable: true })
+    description?: string;
 
     @Column({ type: 'integer', nullable: true })
-    maxCapacity: number;
+    maxCapacity?: number;
 
     // Localização
     @Column({ type: 'text' })
@@ -33,18 +33,19 @@ export class Venue {
 
     // Contato
     @Column({ length: 15, nullable: true })
-    phone: string;
+    phone?: string;
 
     @Column({ length: 100, nullable: true })
-    email: string;
+    email?: string;
 
     // Controle
     @Column({ default: true })
-    isActive: boolean;
+    isActive?: boolean;
 
-    // @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-    // createdAt: Date;
+    //Control
+    @Column()
+    userId: string
 
-    // @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
-    // updatedAt: Date;
+    @Column({type: 'text', nullable: true})
+    adminsId?: string[]
 }

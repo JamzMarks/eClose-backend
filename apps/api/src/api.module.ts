@@ -7,6 +7,7 @@ import { AuthController } from './controllers/auth.controller';
 import { ApiController } from './api.controller';
 import { ApiService } from './api.service';
 import { EventsController } from './controllers/events.controller';
+import { VenueController } from './controllers/venue.controller';
 
 @Module({
   imports: [
@@ -67,9 +68,18 @@ import { EventsController } from './controllers/events.controller';
           queueOptions: { durable: true },
         },
       },
+      {
+        name: 'VENUE_SERVICE',
+        transport: Transport.RMQ,
+        options: {
+          urls: [process.env.RMQ_URL || 'amqp://localhost:5672'],
+          queue: 'venue_queue',
+          queueOptions: { durable: true },
+        },
+      },
     ]),
   ],
-  controllers: [ApiController, UserController, AuthController, EventsController],
+  controllers: [ApiController, UserController, AuthController, EventsController, VenueController],
   providers: [ApiService],
 })
 export class ApiModule {}

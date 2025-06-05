@@ -3,9 +3,8 @@ import { AuthController } from "./auth.controller";
 import { JwtModule } from "@nestjs/jwt";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { AuthService } from "./services/auth.service";
-import { UserClientService } from "./services/user-client.service";
-import { HttpModule } from "@nestjs/axios";
-import { UserClientModule } from "./clients/user-client.module";
+// import { UserClientService } from "./services/user-client.service";
+import { userClientProvider } from "./auth.providers";
 
 @Module({
     imports: [
@@ -21,11 +20,10 @@ import { UserClientModule } from "./clients/user-client.module";
                 },
             }),
             inject: [ConfigService],
-        }),
-        HttpModule, UserClientModule
+        })
     ],
     controllers: [AuthController],
-    providers: [AuthService, UserClientService],
+    providers: [AuthService, userClientProvider],
     exports: [],
 })
 export class AuthModule {

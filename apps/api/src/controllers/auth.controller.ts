@@ -1,3 +1,4 @@
+import { AuthCommands } from "@app/common/constants/auth.commands";
 import { LoginDto } from "@app/common/dtos/user/login.dto";
 import { BadRequestException, Body, Controller, HttpException, Inject, InternalServerErrorException, Post, ValidationPipe } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
@@ -11,12 +12,12 @@ export class AuthController {
         
     @Post('signin')
     async authSignIn(@Body() body: LoginDto){
-        return await firstValueFrom(this.authClient.send({ cmd: 'sign_in' }, body));
+        return await firstValueFrom(this.authClient.send({ cmd: AuthCommands.SIGN_IN }, body));
 
     }
     
     @Post('signup')
     async authSignUp(@Body() body: any){
-        return await firstValueFrom(this.authClient.send({ cmd: 'sign_up' }, body));
+        return await firstValueFrom(this.authClient.send({ cmd: AuthCommands.SIGN_UP }, body));
     }
 }

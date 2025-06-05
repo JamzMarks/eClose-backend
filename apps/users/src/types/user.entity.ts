@@ -1,4 +1,5 @@
 import { Column, Entity, Index, PrimaryGeneratedColumn } from "typeorm";
+import { UserRole } from "./user.role";
 @Entity()
 export class User{
 
@@ -18,5 +19,8 @@ export class User{
 
     @Column({ select: false })
     password: string;
+
+    @Column({ type: 'text', default: UserRole.USER })
+    role: UserRole;
 
 }

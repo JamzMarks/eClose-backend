@@ -27,11 +27,6 @@ export class UserController {
         return this.userClient.send({ cmd: UserCommands.FIND_BY_USERNAME }, username).toPromise();
     }
 
-    @Post()
-    async createUser(@Body() createUserDto: any) {
-        return this.userClient.send({ cmd: UserCommands.CREATE }, createUserDto).toPromise();
-    }
-
     @Delete(':id')
     async deleteUser(@Param('id') id: string) {
         return this.userClient.send({ cmd: UserCommands.DELETE }, id).toPromise();

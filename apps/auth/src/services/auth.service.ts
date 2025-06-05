@@ -1,38 +1,44 @@
 import {
+  Inject,
   Injectable,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { compare } from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
-import { UserClientService } from './user-client.service';
 import { AuthResponseDto } from '../dto/auth-response.dto';
 import { JwtPayload } from '@app/common/contracts/auth/jwt-payload.interface';
-import { RpcException } from '@nestjs/microservices';
+import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { CreateUserDto } from '@app/common/dtos/user/create-user.dto';
+import { UserCommands } from '@app/common/constants/user.commands';
+import { firstValueFrom } from 'rxjs';
+import { UserDto } from '@app/common/dtos/user/user.dto';
 
 @Injectable()
 export class AuthService {
   private jwtExpirationTime: number;
   constructor(
-    private userService: UserClientService,
+    @Inject('USER_SERVICE') private readonly userClient: ClientProxy,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {
     this.jwtExpirationTime =
       this.configService.get<number>('JWT_EXPIRATION_TIME') || 3600;
   }
+  async sendAndAwait<T>(cmd: string, payload: any): Promise<T> {
+    return await firstValueFrom(this.userClient.send<T>({ cmd }, payload));
+  }
 
   async signIn(email: string, password: string): Promise<AuthResponseDto> {
-      const user = await this.userService.findUserByEmailWithPassword(email);
-      console.log('User found:', user);
+      const user = await this.sendAndAwait<UserDto>(UserCommands.FIND_BY_EMAIL_WITH_PASSWORD, email);
 
-      if (!user || !(await compare(password, user.password))) {
+      if (!user || !user.password || !(await compare(password, user.password))) {
         throw new RpcException({ statusCode: 401, message: 'Invalid credentials' });
       }
 
       const payload: JwtPayload = {
         sub: user.id,
         email: user.email,
+        role: user.role
       };
 
       const accessToken = this.jwtService.sign(payload, {
@@ -50,16 +56,17 @@ export class AuthService {
   }
 
   async signUp(userDto: CreateUserDto): Promise<AuthResponseDto> {
-    const existingUser = await this.userService.findUserByEmail(userDto.email);
+    const existingUser = await this.sendAndAwait<UserDto>(UserCommands.FIND_BY_EMAIL, userDto.email);
+
     if (existingUser) {
       throw new RpcException({ statusCode: 409, message: 'Email already in use' });
     }
 
     // Cria o usuário
-    const user = await this.userService.createUser(userDto);
+    const user = await this.sendAndAwait<UserDto>(UserCommands.CREATE, userDto);
 
     // Gera o token
-    const payload: JwtPayload = { sub: user.id, email: user.email };
+    const payload: JwtPayload = { sub: user.id, email: user.email, role: user.role };
     const accessToken = this.jwtService.sign(payload, {
       expiresIn: `${this.jwtExpirationTime}s`,
     });

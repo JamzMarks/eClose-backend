@@ -4,6 +4,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { User } from "./types/user.entity";
 import { CreateUserDto } from "@app/common/dtos/user/create-user.dto";
+import { UserRole } from "./types/user.role";
 
 @Injectable()
 export class UserService {
@@ -35,10 +36,9 @@ export class UserService {
 
     async createUser(user: CreateUserDto): Promise<User> {
          const newUser = this.repo.create({
-            name: user.name,
-            username: user.username,
-            email: user.email,
+            ...user,
             password: hashSync(user.password, 10),
+            role: UserRole.USER,
         });
         return await this.repo.save(newUser);
     }
