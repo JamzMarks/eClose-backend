@@ -6,9 +6,9 @@ import { compare } from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { UserClientService } from './user-client.service';
 import { AuthResponseDto } from '../dto/auth-response.dto';
-import { CreateUserDto } from '../types/user.dto';
 import { JwtPayload } from '@app/common/contracts/auth/jwt-payload.interface';
 import { RpcException } from '@nestjs/microservices';
+import { CreateUserDto } from '@app/common/dtos/user/create-user.dto';
 
 @Injectable()
 export class AuthService {

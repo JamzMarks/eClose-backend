@@ -1,10 +1,10 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
  @Entity()
- export class Event {
+ export class Events {
 
     @PrimaryGeneratedColumn('uuid')
-    id: number;
+    id: string;
 
     @Column()
     name: string;
@@ -15,9 +15,15 @@ import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
     @Column()
     location: string;
 
-    @Column()
+    @Column({nullable: true})
     description: string;
 
     @Column()
-    organizer: string;
+    organizerId: string;
+
+    @Column()
+    organizerType: string;
+
+    @Column({nullable: true})
+    admins: string[];
  }

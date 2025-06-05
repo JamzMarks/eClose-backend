@@ -19,7 +19,6 @@ export class UserController {
 
     @Get('email/:email')
     async getUserByEmail(@Param('email') email: string) {
-        console.log('getUserByEmail', email);
         return this.userClient.send({ cmd: UserCommands.FIND_BY_EMAIL }, email).toPromise();
     }
 

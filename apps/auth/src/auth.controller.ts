@@ -3,7 +3,7 @@ import { AuthService } from "./services/auth.service";
 import { AuthResponseDto } from "./dto/auth-response.dto";
 import { Ctx, MessagePattern, Payload, RmqContext } from "@nestjs/microservices";
 import { AuthCommands } from "@app/common/constants/auth.commands";
-import { LoginDto } from "@app/common/dtos/login.dto";
+import { LoginDto } from "@app/common/dtos/user/login.dto";
 
 @Controller('auth')
 export class AuthController {

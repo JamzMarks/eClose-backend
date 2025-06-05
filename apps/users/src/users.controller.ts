@@ -2,8 +2,9 @@ import { Body, Controller} from "@nestjs/common";
 import { MessagePattern } from "@nestjs/microservices";
 import { UserService } from "./users.service";
 import { User } from "./types/user.entity";
-import { CreateUserDto, UserDto } from "./types/user.dto";
 import { UserCommands } from "@app/common/constants/user.commands";
+import { CreateUserDto } from "@app/common/dtos/user/create-user.dto";
+import { UserDto } from "@app/common/dtos/user/user.dto";
 
 
 @Controller('user')

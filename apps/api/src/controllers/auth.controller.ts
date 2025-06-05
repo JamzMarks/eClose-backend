@@ -1,4 +1,4 @@
-import { LoginDto } from "@app/common/dtos/login.dto";
+import { LoginDto } from "@app/common/dtos/user/login.dto";
 import { BadRequestException, Body, Controller, HttpException, Inject, InternalServerErrorException, Post, ValidationPipe } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
 import { firstValueFrom } from "rxjs";
@@ -16,7 +16,7 @@ export class AuthController {
     }
     
     @Post('signup')
-    async AuthSignUp(@Body() body: any){
+    async AuthSignUp(@Body(new ValidationPipe()) body: any){
         return await firstValueFrom(this.authClient.send({ cmd: 'sign_up' }, body));
     }
 }
