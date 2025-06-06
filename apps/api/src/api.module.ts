@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { UserController } from './controllers/user.controller';
@@ -8,11 +8,14 @@ import { ApiController } from './api.controller';
 import { ApiService } from './api.service';
 import { EventsController } from './controllers/events.controller';
 import { VenueController } from './controllers/venue.controller';
+// import { JwtModule, JwtService } from '@nestjs/jwt';
+import { JwtAuthModule } from './module/jwt.module';
 
 @Module({
   imports: [
+    JwtAuthModule,
     TypeOrmModule.forRootAsync({
-      useFactory: () => { 
+      useFactory: () => {
         const isProd = process.env.NODE_ENV === 'production';
         return isProd
           ? {
@@ -39,17 +42,16 @@ import { VenueController } from './controllers/venue.controller';
       isGlobal: true,
       envFilePath: 'apps/api/.env',
     }),
-    // EventModule,
     ClientsModule.register([
-    {
-      name: 'USER_SERVICE',
-      transport: Transport.RMQ,
-      options: {
-        urls: [process.env.RMQ_URL || 'amqp://localhost:5672'],
-        queue: 'user_queue',
-        queueOptions: { durable: true },
+      {
+        name: 'USER_SERVICE',
+        transport: Transport.RMQ,
+        options: {
+          urls: [process.env.RMQ_URL || 'amqp://localhost:5672'],
+          queue: 'user_queue',
+          queueOptions: { durable: true },
+        },
       },
-    },
       {
         name: 'AUTH_SERVICE',
         transport: Transport.RMQ,
@@ -79,7 +81,13 @@ import { VenueController } from './controllers/venue.controller';
       },
     ]),
   ],
-  controllers: [ApiController, UserController, AuthController, EventsController, VenueController],
+  controllers: [
+    ApiController,
+    UserController,
+    AuthController,
+    EventsController,
+    VenueController,
+  ],
   providers: [ApiService],
 })
 export class ApiModule {}

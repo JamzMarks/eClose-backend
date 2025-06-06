@@ -1,37 +1,33 @@
-// libs/common/src/interceptors/jwt-rpc.interceptor.ts
-
-import {
-  CallHandler,
-  ExecutionContext,
-  Injectable,
-  NestInterceptor,
-  UnauthorizedException,
-} from '@nestjs/common';
-import { Observable } from 'rxjs';
-import { Reflector } from '@nestjs/core';
+import { CallHandler, ExecutionContext, Injectable, NestInterceptor, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { RpcException } from '@nestjs/microservices';
+import { Observable } from 'rxjs';
+import { RmqContext } from '@nestjs/microservices';
 
 @Injectable()
 export class JwtAuthRpcInterceptor implements NestInterceptor {
-  constructor(private jwtService: JwtService) {}
+  constructor(private readonly jwtService: JwtService) {}
 
-  async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<any>> {
-    const ctx = context.switchToRpc();
-    const data = ctx.getData();
+  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+    if (context.getType() === 'rpc') {
+      const ctx = context.switchToRpc().getContext<RmqContext>();
+      const data = context.switchToRpc().getData();
 
-    const token = data?.accessToken || data?.Authorization || data?.authorization;
+      // Tenta pegar metadata dos headers da mensagem
+      const headers = ctx.getArgByIndex(1)?.properties?.headers;
+      const authHeader = headers?.authorization || headers?.Authorization;
+      
+      if (!authHeader) {
+        throw new UnauthorizedException('Token not provided');
+      }
 
-    if (!token) {
-      throw new RpcException(new UnauthorizedException('Token not provided'));
-    }
+      const [, token] = authHeader.split(' ');
 
-    try {
-      const payload = this.jwtService.verify(token.replace('Bearer ', ''));
-      // Injeta o payload do usuário no contexto (para RolesGuard, etc.)
-      ctx.getContext().user = payload;
-    } catch (err) {
-      throw new RpcException(new UnauthorizedException('Invalid or expired token'));
+      try {
+        const decoded = this.jwtService.verify(token);
+        (data as any).user = decoded;
+      } catch (err) {
+        throw new UnauthorizedException('Invalid token');
+      }
     }
 
     return next.handle();

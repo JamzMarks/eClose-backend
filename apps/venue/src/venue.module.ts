@@ -4,8 +4,7 @@ import { VenueService } from './venue.service';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Venue } from './venue.entity';
-import { JwtAuthRpcInterceptor } from '@app/common/interceptors/jwt-rpc.interceptor';
-import { APP_INTERCEPTOR } from '@nestjs/core';
+import { SharedJWTModule } from '@app/common/module/jwt.module';
 
 @Module({
   imports: [
@@ -36,14 +35,10 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
               autoLoadEntities: true,
         }}
     }),
-    TypeOrmModule.forFeature([Venue])
+    TypeOrmModule.forFeature([Venue]),
   ],
   controllers: [VenueController],
-  providers: [VenueService,
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: JwtAuthRpcInterceptor,
-    },
+  providers: [VenueService
   ],
 })
 export class VenueModule {}

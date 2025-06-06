@@ -30,7 +30,7 @@ export class AuthService {
 
   async signIn(email: string, password: string): Promise<AuthResponseDto> {
       const user = await this.sendAndAwait<UserDto>(UserCommands.FIND_BY_EMAIL_WITH_PASSWORD, email);
-
+      
       if (!user || !user.password || !(await compare(password, user.password))) {
         throw new RpcException({ statusCode: 401, message: 'Invalid credentials' });
       }
