@@ -5,10 +5,9 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { UserController } from './controllers/user.controller';
 import { AuthController } from './controllers/auth.controller';
 import { ApiController } from './api.controller';
-import { ApiService } from './api.service';
+import { ApiService } from './services/api.service';
 import { EventsController } from './controllers/events.controller';
 import { VenueController } from './controllers/venue.controller';
-// import { JwtModule, JwtService } from '@nestjs/jwt';
 import { JwtAuthModule } from './module/jwt.module';
 
 @Module({
@@ -88,6 +87,8 @@ import { JwtAuthModule } from './module/jwt.module';
     EventsController,
     VenueController,
   ],
-  providers: [ApiService],
+  providers: [ApiService
+    
+  ],
 })
 export class ApiModule {}

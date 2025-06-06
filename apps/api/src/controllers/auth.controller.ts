@@ -12,7 +12,9 @@ export class AuthController {
         
     @Post('signin')
     async authSignIn(@Body() body: LoginDto){
-        return await firstValueFrom(this.authClient.send({ cmd: AuthCommands.SIGN_IN }, body));
+        const teste = await firstValueFrom(this.authClient.send({ cmd: AuthCommands.SIGN_IN }, body));
+        console.log(teste)
+        return teste
 
     }
     

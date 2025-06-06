@@ -10,16 +10,18 @@ export class VenueController{
     constructor(
         @Inject('VENUE_SERVICE') private readonly venueClient: ClientProxy
     ){}
-
-    @UseGuards(JwtAuthGuard)
+    
     @Get()
     async findAll(@User() user: any) {
-        return this.venueClient.send({cmd: VenueCommands.FIND_ALL}, {user: { id: user.sub, roles: user.roles }},).toPromise()
+        return await this.venueClient.send({cmd: VenueCommands.FIND_ALL}, {},).toPromise()
     }
 
+    @UseGuards(JwtAuthGuard)
     @Post()
-    async createVenue(@Body() venue: CreateVenueDto){
-        console.log(VenueController)
-        return this.venueClient.send({cmd: VenueCommands.CREATE}, venue).toPromise()
+    async createVenue(@Body() venue: CreateVenueDto, @User() user: any) {
+        return this.venueClient.send(
+            { cmd: VenueCommands.CREATE },
+            { venue, user: { id: user.sub, roles: user.roles } }
+        ).toPromise();
     }
 }

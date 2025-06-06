@@ -14,7 +14,7 @@ async function bootstrap() {
     },
   });
 
-  app.useGlobalFilters(new GlobalRpcExceptionFilter());
+  // app.useGlobalFilters(new GlobalRpcExceptionFilter());
   await app.listen();
   console.log('Auth MS conectado ao RabbitMQ 🐇');
 }

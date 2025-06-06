@@ -16,13 +16,10 @@ export class JwtAuthGuard implements CanActivate {
     if (!token) throw new UnauthorizedException('Token missing');
 
     try {
-      console.log(token)
       const decoded = this.jwtService.verify(token);
-      console.log('[AuthGuard] Decoded JWT:', decoded);
       request.user = decoded;
       return true;
     } catch (err) {
-      console.error('[AuthGuard] JWT verification failed:', err.message);
       throw new UnauthorizedException('Invalid or expired token');
     }
   }
