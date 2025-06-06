@@ -11,6 +11,7 @@ import { ApiResponse } from '../interface/api.interface';
 @Catch(RpcException)
 export class RpcExceptionFilterToHttp implements ExceptionFilter {
   catch(exception: RpcException, host: ArgumentsHost) {
+    console.log('aqui')
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const error = exception.getError();

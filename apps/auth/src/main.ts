@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { AuthModule } from './auth.module';
-import { GlobalRpcExceptionFilter } from '@app/common/filters/rpc-exception.filter';
+// import { GlobalRpcExceptionFilter } from '@app/common/filters/rpc-exception.filter';
 
 
 async function bootstrap() {
