@@ -1,10 +1,11 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { hashSync } from "bcrypt";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { User } from "./types/user.entity";
 import { CreateUserDto } from "@app/common/dtos/user/create-user.dto";
 import { UserRole } from "./types/user.role";
+import { NotFoundRpcException } from "@app/common/exceptions/NotFoundRpcException";
 
 @Injectable()
 export class UserService {
@@ -22,7 +23,12 @@ export class UserService {
     }
 
     async findUserById(id: string): Promise<User | null> {
-        return await this.repo.findOne({ where: { id } });
+        const user = await this.repo.findOne({ where: { id } });
+        // console.log(user)
+        if(!user){
+            throw new NotFoundRpcException(`User with ID ${id} not found`);
+        }
+        return user
     }
 
     async findUserByEmail(email: string): Promise<User | null> {
@@ -45,7 +51,7 @@ export class UserService {
     async updateUser(id: string, user: Partial<CreateUserDto>): Promise<User> {
         const existingUser = await this.repo.findOne({ where: { id } });
         if (!existingUser) {
-            throw new NotFoundException(`User with ID ${id} not found`);
+            throw new NotFoundRpcException(`User with ID ${id} not found`);
         }
         const updatedUser = Object.assign(existingUser, user);
 
@@ -55,7 +61,7 @@ export class UserService {
     async deleteUser(id: string): Promise<void> {
         const result = await this.repo.delete(id);
         if (result.affected === 0) {
-            throw new NotFoundException(`User with ID: ${id} not found`);
+            throw new NotFoundRpcException(`User with ID: ${id} not found`);
         }
     }
 

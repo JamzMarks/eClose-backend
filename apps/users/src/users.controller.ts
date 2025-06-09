@@ -5,6 +5,7 @@ import { User } from "./types/user.entity";
 import { UserCommands } from "@app/common/constants/user.commands";
 import { CreateUserDto } from "@app/common/dtos/user/create-user.dto";
 import { UserDto } from "@app/common/dtos/user/user.dto";
+import { DataMicroserviceRequest, MicroserviceRequest } from "@app/common/contracts/messages/microservice-request.interface";
 
 
 @Controller('user')
@@ -12,13 +13,13 @@ export class UserController {
     constructor(private readonly userService: UserService){}
 
     @MessagePattern({ cmd: UserCommands.FIND_ALL })
-    getUsers(): Promise<User[]>{
+    getUsers(_: MicroserviceRequest): Promise<User[]>{
         return this.userService.findAll();
     }
     
     @MessagePattern({ cmd: UserCommands.FIND_BY_ID })
-    findUserById(id: string): Promise<User | null> {
-        return this.userService.findUserById(id);
+    findUserById(dto: DataMicroserviceRequest<string>): Promise<User | null> {
+        return this.userService.findUserById(dto.data);
     }
 
     @MessagePattern({ cmd: UserCommands.FIND_BY_EMAIL })
