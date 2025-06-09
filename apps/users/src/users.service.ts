@@ -26,7 +26,6 @@ export class UserService {
     }
 
     async findUserByEmail(email: string): Promise<User | null> {
-        console.log('Received user by email:', email);
         return await this.repo.findOne({ where: { email }});  
     }
 

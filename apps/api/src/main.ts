@@ -9,7 +9,7 @@ async function bootstrap() {
   const app = await NestFactory.create(ApiModule);
 
   app.useGlobalPipes(new ValidationPipe());
-  // app.useGlobalInterceptors(new RpcErrorsInterceptor());
+  app.useGlobalInterceptors(new RpcErrorsInterceptor());
   // app.useGlobalInterceptors(new ResponseInterceptor());
   // app.useGlobalFilters(new RpcExceptionFilterToHttp())
   await app.listen(process.env.PORT ?? 3000);
