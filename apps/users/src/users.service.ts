@@ -40,12 +40,16 @@ export class UserService {
     }
 
     async createUser(user: CreateUserDto): Promise<User> {
-         const newUser = this.repo.create({
-            ...user,
-            password: hashSync(user.password, 10),
-            role: UserRole.USER,
-        });
+        // try {
+            const newUser = this.repo.create({
+                ...user,
+                password: hashSync(user.password, 10),
+                role: UserRole.USER,
+            });
         return await this.repo.save(newUser);
+        // } catch (error) {
+        //     throw new RpcException({statusCode: error.code, message: error.message})
+        // }   
     }
 
     async updateUser(id: string, user: Partial<CreateUserDto>): Promise<User> {

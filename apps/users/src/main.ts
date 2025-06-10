@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { UserModule } from './users.module';
 import { GlobalRpcExceptionFilter } from '@app/common/filters/rpc-exception.filter';
+import { RpcExceptionInterceptor } from '@app/common/filters/database/database-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(UserModule, {
@@ -14,6 +15,7 @@ async function bootstrap() {
   });
 
   // app.useGlobalFilters(new GlobalRpcExceptionFilter());
+  app.useGlobalInterceptors(new RpcExceptionInterceptor());
   await app.listen();
   console.log('User MS conectado ao RabbitMQ 🐇');
 }

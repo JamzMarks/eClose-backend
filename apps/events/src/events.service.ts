@@ -1,8 +1,9 @@
 import { LessThan, MoreThan, Repository } from 'typeorm';
 import { CreateEventDto } from '@app/common/dtos/events/create-event.dto';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Events } from './events.entity';
+import { NotFoundRpcException } from '@app/common/exceptions/NotFoundRpcException';
 
 @Injectable()
 export class EventsService {
@@ -16,7 +17,7 @@ export class EventsService {
 
   async findAll(): Promise<Events[]> {
     return this.repo.find({
-      order: { date: 'ASC' },
+      order: { startDate: 'ASC' },
       take: 50,
     });
   }
@@ -29,18 +30,18 @@ export class EventsService {
     return await this.repo.find({ where: { organizerId } });
   }
 
-  async findEventsByDate(date: Date): Promise<Events[]> {
-    return await this.repo.find({ where: { date } });
+  async findEventsByDate(startDate: Date): Promise<Events[]> {
+    return await this.repo.find({ where: { startDate } });
   }
 
   async findUpcomingEvents(): Promise<Events[]> {
     const now = new Date();
-    return await this.repo.find({ where: { date: MoreThan(now) }, order: { date: 'ASC' } });
+    return await this.repo.find({ where: { startDate: MoreThan(now) }, order: { startDate: 'ASC' } });
   }
 
   async findPastEvents(): Promise<Events[]> {
     const now = new Date();
-    return await this.repo.find({ where: { date: LessThan(now) }, order: { date: 'DESC' } });
+    return await this.repo.find({ where: { startDate: LessThan(now) }, order: { startDate: 'DESC' } });
   }
 
   async createEvent(dto: CreateEventDto): Promise<Events> {
@@ -48,7 +49,7 @@ export class EventsService {
 
     const newEvent = this.repo.create({
       ...dto,
-      date: dateAsDate,
+      startDate: dateAsDate,
     });
     return await this.repo.save(newEvent);
   }
@@ -56,7 +57,7 @@ export class EventsService {
   async updateEvent(id: string, updates: Partial<CreateEventDto>): Promise<Events> {
     const event = await this.repo.findOne({ where: { id } });
     if (!event) {
-      throw new NotFoundException(`Event with ID ${id} not found`);
+      throw new NotFoundRpcException(`Event with ID ${id} not found`);
     }
     Object.assign(event, updates);
     return await this.repo.save(event);
@@ -65,14 +66,14 @@ export class EventsService {
   async deleteEvent(id: string): Promise<void> {
     const result = await this.repo.delete(id);
     if (result.affected === 0) {
-      throw new NotFoundException(`Event with ID: ${id} not found`);
+      throw new NotFoundRpcException(`Event with ID: ${id} not found`);
     }
   }
 
   async cancelEvent(id: string): Promise<Events> {
     const event = await this.repo.findOne({ where: { id } });
     if (!event) {
-      throw new NotFoundException(`Event with ID ${id} not found`);
+      throw new NotFoundRpcException(`Event with ID ${id} not found`);
     }
     event.description = `[CANCELLED] ${event.description || ''}`;
     return this.repo.save(event);

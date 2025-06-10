@@ -56,30 +56,27 @@ export class AuthService {
   }
 
   async signUp(userDto: CreateUserDto): Promise<AuthResponseDto> {
-    const existingUser = await this.sendAndAwait<UserDto>(UserCommands.FIND_BY_EMAIL, userDto.email);
+    try {
+      const user = await this.sendAndAwait<UserDto>(UserCommands.CREATE, userDto);
+      // Gera o token
+      const payload: JwtPayload = { sub: user.id, email: user.email, role: user.role };
+      const accessToken = this.jwtService.sign(payload, {
+        expiresIn: `${this.jwtExpirationTime}s`,
+      });
 
-    if (existingUser) {
-      throw new RpcException({ statusCode: 409, message: 'Email already in use' });
-    }
+      const refreshToken = this.jwtService.sign(payload, {
+        expiresIn: '7d', // pode ser 15d, 30d, etc.
+      });
 
-    // Cria o usuário
-    const user = await this.sendAndAwait<UserDto>(UserCommands.CREATE, userDto);
-
-    // Gera o token
-    const payload: JwtPayload = { sub: user.id, email: user.email, role: user.role };
-    const accessToken = this.jwtService.sign(payload, {
-      expiresIn: `${this.jwtExpirationTime}s`,
-    });
-
-    const refreshToken = this.jwtService.sign(payload, {
-      expiresIn: '7d', // pode ser 15d, 30d, etc.
-    });
-
-    return {
-      accessToken: accessToken,
-      refreshToken: refreshToken,
-      expiresIn: this.jwtExpirationTime,
-    };
+      return {
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+        expiresIn: this.jwtExpirationTime,
+      };
+    } catch (error) {
+      console.log(error)
+       throw new RpcException({ statusCode: error.code, message: error.message });
+    }    
   }
 
   async refreshToken(refreshToken: string): Promise<AuthResponseDto> {
