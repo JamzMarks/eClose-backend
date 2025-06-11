@@ -10,17 +10,15 @@ export class User{
     name: string;
 
     @Column({ unique: true })
-    @Index()
     username: string;
 
     @Column({ unique: true })
-    @Index()
     email: string;
 
     @Column({ select: false })
     password: string;
 
-    @Column({ type: 'text', default: UserRole.USER })
-    role: UserRole;
+    @Column({ type: 'varchar', default: UserRole.USER })
+    role: string;
 
 }

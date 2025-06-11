@@ -10,7 +10,7 @@ async function bootstrap() {
   app.enableCors();
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new RpcErrorsInterceptor());
-  app.useGlobalInterceptors(new ResponseInterceptor());
+  // app.useGlobalInterceptors(new ResponseInterceptor());
   await app.listen(process.env.PORT ?? 3000);
   console.log('Gateway rodando na porta 3000 🚀');
 }

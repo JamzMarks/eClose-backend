@@ -12,6 +12,7 @@ import { ApiResponse, ApiStatus } from '../interface/api.interface';
 
 @Injectable()
 export class RpcErrorsInterceptor implements NestInterceptor {
+  
   intercept(context: ExecutionContext, next: CallHandler): Observable<ApiResponse<unknown>> {
     return next.handle().pipe(
       catchError((error) => {

@@ -1,14 +1,17 @@
 import { UserCommands } from "@app/common/constants/user.commands";
-import { Body, Controller, Delete, Get, Inject, Param, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Inject, Param, Post, UseGuards } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
 import { buildMicroserviceRequest } from "../utils/buildMicroserviceRequest";
 import { User } from "../decorator/user.decorator";
+import { JwtAuthGuard } from "@app/common/guards/auth/jwt-auth.guard";
 
+@UseGuards(JwtAuthGuard)
 @Controller('user')
 export class UserController {
     constructor(
         @Inject('USER_SERVICE') private readonly userClient: ClientProxy) {}
 
+    
     @Get()
     async findAll(@User() user: any) {
         const payload = buildMicroserviceRequest(user)
@@ -31,6 +34,7 @@ export class UserController {
         return this.userClient.send({ cmd: UserCommands.FIND_BY_USERNAME }, username).toPromise();
     }
 
+    
     @Delete(':id')
     async deleteUser(@Param('id') id: string) {
         return this.userClient.send({ cmd: UserCommands.DELETE }, id).toPromise();

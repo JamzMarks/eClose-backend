@@ -10,12 +10,12 @@ console.log(process.env.DB_USERNAME)
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env'
+      envFilePath: 'apps/venue/.env'
     }),
     TypeOrmModule.forRootAsync({
       useFactory: () => {
         const isProd = process.env.NODE_ENV === 'production';
-        return isProd
+        return !isProd
           ? {
               type: 'mysql',
               host: process.env.DB_HOST,

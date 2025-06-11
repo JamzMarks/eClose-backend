@@ -10,12 +10,12 @@ import { User } from "./types/user.entity";
     imports: [
       ConfigModule.forRoot({
         isGlobal: true,
-        envFilePath: '.env',
+        envFilePath: 'apps/users/.env',
       }),
       TypeOrmModule.forRootAsync({
         useFactory: () => {
           const isProd = process.env.NODE_ENV === 'production';
-          return isProd
+          return !isProd
             ? {
                 type: 'mysql',
                 host: process.env.DB_HOST,
