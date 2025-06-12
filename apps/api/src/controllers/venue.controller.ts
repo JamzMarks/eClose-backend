@@ -1,8 +1,7 @@
 import { VenueCommands } from '@app/common/constants/venue.commands';
 import { CreateVenueDto } from '@app/common/dtos/venue/venue.dto';
-import { Body, Controller, Get, Inject, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Post } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { User } from '../decorator/user.decorator';
 import { buildMicroserviceRequest } from '../utils/buildMicroserviceRequest';
 
