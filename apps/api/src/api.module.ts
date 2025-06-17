@@ -9,9 +9,11 @@ import { ApiService } from './services/api.service';
 import { EventsController } from './controllers/events.controller';
 import { VenueController } from './controllers/venue.controller';
 import { JwtAuthModule } from './module/jwt.module';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
+    HttpModule,
     JwtAuthModule,
     TypeOrmModule.forRootAsync({
       useFactory: () => {

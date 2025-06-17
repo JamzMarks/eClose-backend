@@ -39,7 +39,7 @@ export class Events {
   ticketLimit: number;
 
   // @Column({ type: "timestamp" })
-  @Column()
+  @Column({nullable: true})
   startDate: Date;
 
   @Column({nullable: true})

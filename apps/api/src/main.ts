@@ -4,11 +4,20 @@ import { RpcErrorsInterceptor } from './interceptors/rpc-errors.interceptor';
 import { ValidationPipe } from '@nestjs/common';
 import { ResponseInterceptor } from './interceptors/api-response.interceptor';
 import * as cookieParser from 'cookie-parser';
+import { HttpExceptionFilter } from './filters/httpException.filter';
+import { HttpAdapterHost } from '@nestjs/core';
 
 async function bootstrap() {
   const app = await NestFactory.create(ApiModule);
+  app.enableCors({
+    origin: 'http://localhost:3001', // seu front
+    credentials: true, // permitir cookies
+  });
 
-  app.enableCors();
+  // const httpAdapterHost = app.get(HttpAdapterHost);
+  // app.useGlobalFilters(new HttpExceptionFilter (httpAdapterHost));
+
+  app.useGlobalPipes(new ValidationPipe());
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new RpcErrorsInterceptor());
   // app.useGlobalInterceptors(new ResponseInterceptor());

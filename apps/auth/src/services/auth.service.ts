@@ -1,6 +1,9 @@
 import {
+  HttpException,
+  HttpStatus,
   Inject,
   Injectable,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { compare } from 'bcrypt';
@@ -32,7 +35,8 @@ export class AuthService {
       const user = await this.sendAndAwait<UserDto>(UserCommands.FIND_BY_EMAIL_WITH_PASSWORD, email);
       
       if (!user || !user.password || !(await compare(password, user.password))) {
-        throw new RpcException({ statusCode: 401, message: 'Invalid credentials' });
+        // throw new RpcException({ statusCode: 401, message: 'Invalid credentials' });
+        throw new UnauthorizedException('Invalid credentials');
       }
 
       const payload: JwtPayload = {
@@ -75,7 +79,11 @@ export class AuthService {
       };
     } catch (error) {
       console.log(error)
-       throw new RpcException({ statusCode: error.code, message: error.message });
+      throw new HttpException({
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: error?.message || 'Erro interno no servidor',
+      },
+      HttpStatus.INTERNAL_SERVER_ERROR,) 
     }    
   }
 
@@ -99,7 +107,8 @@ export class AuthService {
         expiresIn: this.jwtExpirationTime,
       };
     } catch (error) {
-       throw new RpcException({ statusCode: 401, message: 'Invalid refresh token' });
+      throw new UnauthorizedException('Invalid refresh token');
+      //  throw new RpcException({ statusCode: 401, message: 'Invalid refresh token' });
     }
   }
 }
