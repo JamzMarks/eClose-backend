@@ -13,7 +13,7 @@ import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
-    HttpModule,
+    // HttpModule,
     JwtAuthModule,
     TypeOrmModule.forRootAsync({
       useFactory: () => {

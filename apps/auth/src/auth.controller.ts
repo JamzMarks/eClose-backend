@@ -11,21 +11,21 @@ export class AuthController {
         private readonly authService: AuthService,
     ){}
 
-    @Post('signin')
-    // @MessagePattern({ cmd: AuthCommands.SIGN_IN })
+    // @Post('signin')
+    @MessagePattern({ cmd: AuthCommands.SIGN_IN })
     async signIn(@Payload() user: LoginDto ): Promise<AuthResponseDto> {
         console.log(user)
         return await this.authService.signIn(user.email, user.password);
     }
     
-    @Post('signup')
-    // @MessagePattern({ cmd: AuthCommands.SIGN_UP })
+    // @Post('signup')
+    @MessagePattern({ cmd: AuthCommands.SIGN_UP })
     signUp(@Payload() user: any): Promise<any> {
         return this.authService.signUp(user);
     }
 
-    @Post('logout')
-    // @MessagePattern({ cmd: AuthCommands.REFRESH })
+    // @Post('logout')
+    @MessagePattern({ cmd: AuthCommands.REFRESH })
     async refreshToken(@Payload('refreshToken') refreshToken: string): Promise<AuthResponseDto> {
         return this.authService.refreshToken(refreshToken);
     }
