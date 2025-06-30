@@ -4,13 +4,13 @@ import { VenueService } from './venue.service';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Venue } from './venue.entity';
-import { SharedJWTModule } from '@app/common/module/jwt.module';
 
+console.log(process.env.DB_USERNAME)
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env'
+      envFilePath: 'apps/venue/.env'
     }),
     TypeOrmModule.forRootAsync({
       useFactory: () => {

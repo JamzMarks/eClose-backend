@@ -1,25 +1,47 @@
-import { AuthCommands } from "@app/common/constants/auth.commands";
-import { LoginDto } from "@app/common/dtos/user/login.dto";
-import { BadRequestException, Body, Controller, HttpException, Inject, InternalServerErrorException, Post, ValidationPipe } from "@nestjs/common";
-import { ClientProxy } from "@nestjs/microservices";
-import { firstValueFrom } from "rxjs";
+import { AuthCommands } from '@app/common/constants/auth.commands';
+import { CreateUserDto } from '@app/common/dtos/user/create-user.dto';
+import { LoginDto } from '@app/common/dtos/user/login.dto';
+import {
+  Body,
+  Controller,
+  Post,
+  Res,
+} from '@nestjs/common';
+import { Response } from 'express';
+import { firstValueFrom } from 'rxjs';
+import { HttpService } from '@nestjs/axios';
+import { UseAxiosErrorInterceptor } from '../decorator/useAxiosErrorInterceptor';
 
+@UseAxiosErrorInterceptor()
 @Controller('auth')
 export class AuthController {
-    constructor(
-        @Inject('AUTH_SERVICE') private readonly authClient: ClientProxy
-    ) {}
-        
-    @Post('signin')
-    async authSignIn(@Body() body: LoginDto){
-        const teste = await firstValueFrom(this.authClient.send({ cmd: AuthCommands.SIGN_IN }, body));
-        console.log(teste)
-        return teste
+  constructor(
+    private readonly httpService: HttpService,
+  ) {}
 
-    }
-    
-    @Post('signup')
-    async authSignUp(@Body() body: any){
-        return await firstValueFrom(this.authClient.send({ cmd: AuthCommands.SIGN_UP }, body));
-    }
+  @Post('signin')
+  async authSignIn(
+    @Body() body: LoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { data } = await firstValueFrom(
+      this.httpService.post('http://localhost:3002/auth/signin', body),
+    );
+    return data;
+  }
+
+  @Post('signup')
+  async authSignUp(@Body() body: CreateUserDto) {
+    const { data } = await firstValueFrom(
+      this.httpService.post('http://localhost:3002/auth/signup', body),
+    );
+    return data;
+  }
+
+  @Post('logout')
+  async logout(@Res({ passthrough: true }) res: Response) {
+    res.clearCookie('accessToken');
+    res.clearCookie('refreshToken');
+    return { success: true };
+  }
 }

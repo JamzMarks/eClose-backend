@@ -10,7 +10,7 @@ import { User } from "./types/user.entity";
     imports: [
       ConfigModule.forRoot({
         isGlobal: true,
-        envFilePath: '.env',
+        envFilePath: 'apps/users/.env',
       }),
       TypeOrmModule.forRootAsync({
         useFactory: () => {

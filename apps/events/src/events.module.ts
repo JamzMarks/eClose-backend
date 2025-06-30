@@ -9,7 +9,7 @@ import { Events } from './events.entity';
   imports: [
       ConfigModule.forRoot({
         isGlobal: true,
-        envFilePath: '.env',
+        envFilePath: 'apps/events/.env',
       }),
       TypeOrmModule.forRootAsync({
         useFactory: () => {
