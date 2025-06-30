@@ -14,7 +14,7 @@ import { Events } from './events.entity';
       TypeOrmModule.forRootAsync({
         useFactory: () => {
           const isProd = process.env.NODE_ENV === 'production';
-          return !isProd
+          return isProd
             ? {
                 type: 'mysql',
                 host: process.env.DB_HOST,

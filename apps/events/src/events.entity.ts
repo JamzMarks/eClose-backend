@@ -52,10 +52,15 @@ export class Events {
   @Column({ nullable: true })
   thumbnailUrl: string;
 
-  @Column({ type: "enum", enum: EventStatus, default: EventStatus.DRAFT })
+  // @Column({ type: "enum", enum: EventStatus, default: EventStatus.DRAFT })
+  // status: EventStatus;
+
+  // @Column({ type: "enum", enum: EventVisibility, default: EventVisibility.PUBLIC })
+  // visibility: EventVisibility;
+   @Column({ type: "varchar", default: EventStatus.DRAFT })
   status: EventStatus;
 
-  @Column({ type: "enum", enum: EventVisibility, default: EventVisibility.PUBLIC })
+  @Column({ type: "varchar", default: EventVisibility.PUBLIC })
   visibility: EventVisibility;
 
   @Column({ nullable: true, type: "text" })

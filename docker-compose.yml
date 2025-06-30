@@ -13,6 +13,24 @@ services:
     networks:
       - rabbitnet
 
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: mydb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: userpass
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - rabbitnet
+
 networks:
   rabbitnet:
     driver: bridge
+
+volumes:
+  mysql_data:

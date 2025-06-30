@@ -32,7 +32,7 @@ export class UserService {
     }
 
     async findUserByEmail(email: string): Promise<User | null> {
-        return await this.repo.findOne({ where: { email }});  
+        return await this.repo.findOne({ where: { email: email.trim().toLowerCase() }});  
     }
 
     async findUserByUsername(username: string): Promise<User | null> {
@@ -40,16 +40,14 @@ export class UserService {
     }
 
     async createUser(user: CreateUserDto): Promise<User> {
-        // try {
+            const normalizedEmail = user.email.trim().toLowerCase();
             const newUser = this.repo.create({
                 ...user,
+                email: normalizedEmail,
                 password: hashSync(user.password, 10),
                 role: UserRole.USER,
             });
         return await this.repo.save(newUser);
-        // } catch (error) {
-        //     throw new RpcException({statusCode: error.code, message: error.message})
-        // }   
     }
 
     async updateUser(id: string, user: Partial<CreateUserDto>): Promise<User> {
@@ -71,6 +69,6 @@ export class UserService {
 
     // THIS METHOD MUST BE RESTRICTED ONLY CAN BE USED BY AUTH SERVICE
     async findUserByEmailWithPassword(email: string): Promise<User | null> {
-        return await this.repo.findOne({ where: { email }, select: ['id', 'email', 'password']});  
+        return await this.repo.findOne({ where: { email: email.trim().toLowerCase() }, select: ['id', 'email', 'password']});  
     }
 }

@@ -1,114 +1,155 @@
 import {
+  Get,
   HttpException,
   HttpStatus,
-  Inject,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { compare } from 'bcrypt';
+import { compare, hashSync } from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { AuthResponseDto } from '../dto/auth-response.dto';
 import { JwtPayload } from '@app/common/contracts/auth/jwt-payload.interface';
-import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { CreateUserDto } from '@app/common/dtos/user/create-user.dto';
-import { UserCommands } from '@app/common/constants/user.commands';
-import { firstValueFrom } from 'rxjs';
-import { UserDto } from '@app/common/dtos/user/user.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { AuthUser } from '../repository/authUser.entity';
 
 @Injectable()
 export class AuthService {
   private jwtExpirationTime: number;
+
   constructor(
-    @Inject('USER_SERVICE') private readonly userClient: ClientProxy,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    @InjectRepository(AuthUser)
+    private readonly repo: Repository<AuthUser>,
   ) {
     this.jwtExpirationTime =
       this.configService.get<number>('JWT_EXPIRATION_TIME') || 3600;
   }
-  async sendAndAwait<T>(cmd: string, payload: any): Promise<T> {
-    return await firstValueFrom(this.userClient.send<T>({ cmd }, payload));
-  }
 
   async signIn(email: string, password: string): Promise<AuthResponseDto> {
-      const user = await this.sendAndAwait<UserDto>(UserCommands.FIND_BY_EMAIL_WITH_PASSWORD, email);
-      
-      if (!user || !user.password || !(await compare(password, user.password))) {
-        // throw new RpcException({ statusCode: 401, message: 'Invalid credentials' });
-        throw new UnauthorizedException('Invalid credentials');
+     
+    const normalizedEmail = email.trim().toLowerCase();
+    const user = await this.repo.findOne({
+      where: { email: normalizedEmail },
+      select: ['id', 'email', 'password'],
+    });
+
+    if (!user || !(await compare(password, user.password))) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    const payload: JwtPayload = {
+      sub: user.id,
+      email: user.email,
+    };
+
+    const accessToken = this.jwtService.sign(payload, {
+      expiresIn: `${this.jwtExpirationTime}s`,
+    });
+    const refreshToken = this.jwtService.sign(payload, {
+      expiresIn: '7d',
+    });
+
+    return {
+      accessToken,
+      refreshToken,
+      expiresIn: this.jwtExpirationTime,
+      user: {
+        id: user.id,
+        email: user.email,
+      },
+    };
+  }
+
+  async signUp(userDto: CreateUserDto): Promise<AuthResponseDto> {
+    const normalizedEmail = userDto.email.trim().toLowerCase();
+
+    const existing = await this.repo.findOne({
+      where: { email: normalizedEmail },
+    });
+    if (existing) {
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.CONFLICT,
+          message: 'Email já está em uso',
+        },
+        HttpStatus.CONFLICT,
+      );
+    }
+
+    const newUser = this.repo.create({
+      ...userDto,
+      email: normalizedEmail,
+      password: hashSync(userDto.password, 10),
+    });
+
+    const savedUser = await this.repo.save(newUser);
+
+    const payload: JwtPayload = {
+      sub: savedUser.id,
+      email: savedUser.email,
+    };
+
+    const accessToken = this.jwtService.sign(payload, {
+      expiresIn: `${this.jwtExpirationTime}s`,
+    });
+
+    const refreshToken = this.jwtService.sign(payload, {
+      expiresIn: '7d',
+    });
+
+    return {
+      accessToken,
+      refreshToken,
+      expiresIn: this.jwtExpirationTime,
+      user: {
+        id: savedUser.id,
+        email: savedUser.email,
+      },
+    };
+  }
+
+  async refreshToken(refreshToken: string): Promise<AuthResponseDto> {
+    try {
+      const payload = await this.jwtService.verify<JwtPayload>(refreshToken);
+
+      const user = await this.repo.findOne({ where: { id: payload.sub } });
+      if (!user) {
+        throw new UnauthorizedException('User no longer exists');
       }
 
-      const payload: JwtPayload = {
+      const newPayload: JwtPayload = {
         sub: user.id,
         email: user.email,
-        role: user.role
       };
 
-      const accessToken = this.jwtService.sign(payload, {
+      const accessToken = this.jwtService.sign(newPayload, {
         expiresIn: `${this.jwtExpirationTime}s`,
       });
-      const refreshToken = this.jwtService.sign(payload, {
+
+      const newRefreshToken = this.jwtService.sign(newPayload, {
         expiresIn: '7d',
       });
 
       return {
         accessToken,
-        refreshToken,
-        expiresIn: this.jwtExpirationTime,
-      };
-  }
-
-  async signUp(userDto: CreateUserDto): Promise<AuthResponseDto> {
-    try {
-      const user = await this.sendAndAwait<UserDto>(UserCommands.CREATE, userDto);
-      // Gera o token
-      const payload: JwtPayload = { sub: user.id, email: user.email, role: user.role };
-      const accessToken = this.jwtService.sign(payload, {
-        expiresIn: `${this.jwtExpirationTime}s`,
-      });
-
-      const refreshToken = this.jwtService.sign(payload, {
-        expiresIn: '7d', // pode ser 15d, 30d, etc.
-      });
-
-      return {
-        accessToken: accessToken,
-        refreshToken: refreshToken,
-        expiresIn: this.jwtExpirationTime,
-      };
-    } catch (error) {
-      console.log(error)
-      throw new HttpException({
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: error?.message || 'Erro interno no servidor',
-      },
-      HttpStatus.INTERNAL_SERVER_ERROR,) 
-    }    
-  }
-
-  async refreshToken(refreshToken: string): Promise<AuthResponseDto> {
-    try {
-      const payload = await this.jwtService.verify(refreshToken);
-      const accessToken = this.jwtService.sign({
-        sub: payload.sub,
-        email: payload.email,
-      });
-      const newRefreshToken = this.jwtService.sign(
-        { sub: payload.sub, email: payload.email },
-        {
-          expiresIn: '7d',
-        },
-      );
-
-      return {
-        accessToken,
         refreshToken: newRefreshToken,
         expiresIn: this.jwtExpirationTime,
+        user: {
+          id: user.id,
+          email: user.email,
+        },
       };
     } catch (error) {
       throw new UnauthorizedException('Invalid refresh token');
-      //  throw new RpcException({ statusCode: 401, message: 'Invalid refresh token' });
     }
+  }
+
+  @Get('health')
+  getHealth() {
+    return { status: 'ok' };
   }
 }

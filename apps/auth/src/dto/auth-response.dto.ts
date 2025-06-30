@@ -1,5 +1,10 @@
 export interface AuthResponseDto {
-  accessToken: string; 
+  accessToken: string;
   refreshToken: string;
   expiresIn: number;
+  user?: {
+    id: string;
+    email: string;
+    role?: string;
+  };
 }

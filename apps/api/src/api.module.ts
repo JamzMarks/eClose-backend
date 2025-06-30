@@ -13,32 +13,32 @@ import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
-    // HttpModule,
+    HttpModule,
     JwtAuthModule,
-    TypeOrmModule.forRootAsync({
-      useFactory: () => {
-        const isProd = process.env.NODE_ENV === 'production';
-        return isProd
-          ? {
-              type: 'mysql',
-              host: process.env.DB_HOST,
-              port: parseInt(process.env.DB_PORT ?? '3306'),
-              username: process.env.DB_USERNAME,
-              password: process.env.DB_PASSWORD,
-              database: process.env.DB_NAME,
-              entities: [__dirname + '/**/*.entity{.ts,.js}'],
-              synchronize: true,
-              autoLoadEntities: true,
-            }
-          : {
-              type: 'sqlite',
-              database: 'dev.db',
-              entities: [__dirname + '/**/*.entity{.ts,.js}'],
-              synchronize: true,
-              autoLoadEntities: true,
-            };
-      },
-    }),
+    // TypeOrmModule.forRootAsync({
+    //   useFactory: () => {
+    //     const isProd = process.env.NODE_ENV === 'production';
+    //     return isProd
+    //       ? {
+    //           type: 'mysql',
+    //           host: process.env.DB_HOST,
+    //           port: parseInt(process.env.DB_PORT ?? '3306'),
+    //           username: process.env.DB_USERNAME,
+    //           password: process.env.DB_PASSWORD,
+    //           database: process.env.DB_NAME,
+    //           entities: [__dirname + '/**/*.entity{.ts,.js}'],
+    //           synchronize: true,
+    //           autoLoadEntities: true,
+    //         }
+    //       : {
+    //           type: 'sqlite',
+    //           database: 'dev.db',
+    //           entities: [__dirname + '/**/*.entity{.ts,.js}'],
+    //           synchronize: true,
+    //           autoLoadEntities: true,
+    //         };
+    //   },
+    // }),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: 'apps/api/.env',
