@@ -7,6 +7,9 @@ import { AuthService } from './services/auth.service';
 import { userClientProvider } from './auth.providers';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthUser } from './repository/authUser.entity';
+import { KafkaProducerService } from './services/KafkaProducer.service';
+import { OutboxEvent } from './repository/outBox.entity';
+// import { KafkaProducerService } from './services/KafkaProducer.service';
 @Module({
   imports: [
     JwtModule.registerAsync({
@@ -52,7 +55,7 @@ import { AuthUser } from './repository/authUser.entity';
           : {
               type: 'sqlite',
               database: 'dev.db',
-              entities: [__dirname + '/**/*.entity{.ts,.js}'],
+              entities: [__dirname + '/**/*.entity{.ts,.js}', OutboxEvent],
               synchronize: true,
               autoLoadEntities: true,
             };
@@ -60,10 +63,10 @@ import { AuthUser } from './repository/authUser.entity';
       inject: [ConfigService],
     }),
 
-    TypeOrmModule.forFeature([AuthUser]),
+    TypeOrmModule.forFeature([AuthUser, OutboxEvent]),
   ],
   controllers: [AuthController],
-  providers: [AuthService, userClientProvider],
+  providers: [AuthService, userClientProvider, KafkaProducerService],
   exports: [],
 })
 export class AuthModule {}

@@ -27,6 +27,6 @@ export class AuthController {
 
   @Get('health')
   getHealth() {
-    return { status: 'ok' };
+    return this.authService.getHealth();
   }
 }

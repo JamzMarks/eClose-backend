@@ -14,12 +14,14 @@ import { CreateUserDto } from '@app/common/dtos/user/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AuthUser } from '../repository/authUser.entity';
+import { KafkaProducerService } from './KafkaProducer.service';
 
 @Injectable()
 export class AuthService {
   private jwtExpirationTime: number;
 
   constructor(
+    private readonly kafka: KafkaProducerService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     @InjectRepository(AuthUser)
@@ -101,6 +103,8 @@ export class AuthService {
       expiresIn: '7d',
     });
 
+    
+
     return {
       accessToken,
       refreshToken,
@@ -148,8 +152,14 @@ export class AuthService {
     }
   }
 
-  @Get('health')
-  getHealth() {
+  async getHealth() {
+    await this.kafka.emit('health_checked', {
+      
+      timestamp: new Date().toISOString(),
+      service: 'auth',
+      status: 'ok',
+    });
+
     return { status: 'ok' };
   }
 }

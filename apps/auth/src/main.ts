@@ -3,13 +3,12 @@ import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { AuthModule } from './auth.module';
 import { GlobalRpcExceptionFilter } from '@app/common/filters/rpc-exception.filter';
 
-
 // async function bootstrap() {
 //   const app = await NestFactory.createMicroservice<MicroserviceOptions>(AuthModule, {
 //     transport: Transport.RMQ,
 //     options: {
 //       urls: ['amqp://localhost:5672'],
-//       queue: 'auth_queue',           
+//       queue: 'auth_queue',
 //       queueOptions: { durable: true },
 //     },
 //   });
@@ -21,9 +20,19 @@ import { GlobalRpcExceptionFilter } from '@app/common/filters/rpc-exception.filt
 
 async function bootstrap() {
   const app = await NestFactory.create(AuthModule);
-
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.KAFKA,
+    options: {
+      client: {
+        brokers: ['localhost:9092'],
+      },
+      consumer: {
+        groupId: 'AUTH_SERVICE_GROUP',
+      },
+    },
+  });
   app.setGlobalPrefix('auth');
   await app.listen(process.env.PORT || 3000);
-  console.log('🚀 Auth API HTTP rodando na porta', process.env.PORT );
+  console.log('🚀 Auth API HTTP rodando na porta', process.env.PORT);
 }
 bootstrap();

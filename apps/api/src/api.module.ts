@@ -10,6 +10,7 @@ import { EventsController } from './controllers/events.controller';
 import { VenueController } from './controllers/venue.controller';
 import { JwtAuthModule } from './module/jwt.module';
 import { HttpModule } from '@nestjs/axios';
+import { KafkaGatewayController } from './controllers/kafka-gateway.controller';
 
 @Module({
   imports: [
@@ -88,6 +89,7 @@ import { HttpModule } from '@nestjs/axios';
     AuthController,
     EventsController,
     VenueController,
+    KafkaGatewayController
   ],
   providers: [ApiService
     
