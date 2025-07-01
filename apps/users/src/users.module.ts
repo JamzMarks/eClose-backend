@@ -4,7 +4,7 @@ import { ConfigModule } from "@nestjs/config";
 import { UserService } from "./users.service";
 import { UserController } from "./users.controller";
 import { User } from "./types/user.entity";
-
+import { KafkaProducerService } from "./services/KafkaProducer.service";
 
 @Module({
     imports: [
@@ -38,7 +38,7 @@ import { User } from "./types/user.entity";
       TypeOrmModule.forFeature([User]),
     ],
     controllers: [UserController],
-    providers: [UserService],
+    providers: [UserService, KafkaProducerService],
     exports: [UserService],
 })
 export class UserModule {}

@@ -1,10 +1,10 @@
 export const UserCommands = {
-  FIND_ALL: 'find_users',
-  FIND_BY_ID: 'find_users_by_id',
-  FIND_BY_EMAIL: 'find_users_by_email',
-  FIND_BY_EMAIL_WITH_PASSWORD: 'find_users_by_email_with_password',
-  FIND_BY_USERNAME: 'find_users_by_username',
-  CREATE: 'create_user',
-  UPDATE: 'update_user',
-  DELETE: 'delete_user',
+  FIND_ALL: 'find-users',
+  FIND_BY_ID: 'find-users-by-id',
+  FIND_BY_EMAIL: 'find-users-by-email',
+  FIND_BY_EMAIL_WITH_PASSWORD: 'find-users-by-email-with-password',
+  FIND_BY_USERNAME: 'find-users-by-username',
+  CREATE: 'create-user',
+  UPDATE: 'update-user',
+  DELETE: 'delete-user',
 } as const;
