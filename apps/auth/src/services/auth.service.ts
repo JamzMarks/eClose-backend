@@ -103,8 +103,11 @@ export class AuthService {
       expiresIn: '7d',
     });
 
-    
-
+    await this.kafka.emit('user-created', {
+      id: savedUser.id,
+      email: savedUser.email,
+    });
+  
     return {
       accessToken,
       refreshToken,
@@ -153,7 +156,7 @@ export class AuthService {
   }
 
   async getHealth() {
-    await this.kafka.emit('health_checked', {
+    await this.kafka.emit('created-user', {
       
       timestamp: new Date().toISOString(),
       service: 'auth',

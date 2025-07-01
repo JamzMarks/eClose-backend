@@ -4,7 +4,7 @@ import { AuthResponseDto } from './dto/auth-response.dto';
 import { Payload } from '@nestjs/microservices';
 import { LoginDto } from '@app/common/dtos/user/login.dto';
 
-@Controller()
+@Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 

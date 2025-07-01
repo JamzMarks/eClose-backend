@@ -1,24 +1,40 @@
-import { Column, Entity, Index, PrimaryGeneratedColumn } from "typeorm";
-import { UserRole } from "./user.role";
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+
 @Entity()
-export class User{
+export class User {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+  @Column({ type: 'uuid', unique: true })
+  userId: string;
 
-    @Column()
-    name: string;
+  @Column({ nullable: true })
+  username: string;
 
-    @Column({ unique: true })
-    username: string;
+  @Column({ nullable: true })
+  firstName: string;
 
-    @Column({ unique: true })
-    email: string;
+  @Column({ nullable: true })
+  lastName: string;
 
-    @Column({ select: false })
-    password: string;
+  @Column({ nullable: true })
+  avatarUrl: string;
 
-    @Column({ type: 'varchar', default: UserRole.USER })
-    role: string;
+  @Column({ type: 'text', nullable: true })
+  bio: string;
 
+  @Column({ nullable: true })
+  birthDate: Date;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }

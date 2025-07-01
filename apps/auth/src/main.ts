@@ -32,7 +32,6 @@ async function bootstrap() {
       },
     },
   });
-  app.setGlobalPrefix('auth');
   await app.listen(process.env.PORT || 3000);
   console.log('🚀 Auth API HTTP rodando na porta', process.env.PORT);
 }

@@ -1,12 +1,12 @@
-import { Body, Controller, Get} from "@nestjs/common";
-import { MessagePattern } from "@nestjs/microservices";
+import { Body, Controller, Get, Param, Post} from "@nestjs/common";
+import { EventPattern, MessagePattern, Payload } from "@nestjs/microservices";
 import { UserService } from "./users.service";
 import { User } from "./types/user.entity";
 import { UserCommands } from "@app/common/constants/user.commands";
 import { CreateUserDto } from "@app/common/dtos/user/create-user.dto";
 import { UserDto } from "@app/common/dtos/user/user.dto";
 import { DataMicroserviceRequest, MicroserviceRequest } from "@app/common/contracts/messages/microservice-request.interface";
-import { ok } from "assert";
+import { EmptyUserDto } from "./dto/emptyUser.dto";
 
 
 @Controller('users')
@@ -18,10 +18,7 @@ export class UserController {
     //     return this.userService.findAll();
     // }
     
-    // @MessagePattern({ cmd: UserCommands.FIND_BY_ID })
-    // findUserById(dto: DataMicroserviceRequest<string>): Promise<User | null> {
-    //     return this.userService.findUserById(dto.data);
-    // }
+    
 
     // @MessagePattern({ cmd: UserCommands.FIND_BY_EMAIL })
     // findUserByEmail(email: string): Promise<User | null> {
@@ -53,6 +50,30 @@ export class UserController {
     // deleteUser(@Body() id: string): Promise<void> {
     //     return this.userService.deleteUser(id);
     // }
+
+    // @Get(':id')
+    // findUserById(dto: DataMicroserviceRequest<string>): Promise<User | null> {
+    //     return this.userService.findUserById(dto.data);
+    // }
+
+    @Get(':id')
+    findUserById(@Param('id') id: string): Promise<User | null> {
+        return this.userService.findUserById(id);
+    }
+
+    @Post('create-user')
+    async createUser(@Body() user: UserDto): Promise<any> {
+        return this.userService.createUser(user);
+    }
+
+    @EventPattern('user-created')
+    async createEmptyUser(@Payload() user: EmptyUserDto): Promise<void> {
+        try {
+            await this.userService.createEmptyProfile(user);
+        } catch (error) {
+            console.log('Error creating empty user profile:', error);
+        }
+    }
 
     @Get('health')
     checkHealth(): Promise<string> {

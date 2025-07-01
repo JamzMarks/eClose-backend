@@ -14,8 +14,9 @@
     "dev:auth": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register apps/auth/src/main.ts",
     "dev:events": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register apps/events/src/main.ts",
     "dev:venue": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register apps/venue/src/main.ts",
+    "dev:mail": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register apps/mail/src/main.ts",
     "dev:map": "ts-node-dev apps/map/src/main.ts",
-    "dev:all": "run-p dev:gateway dev:user dev:auth dev:events dev:venue",
+    "dev:all": "run-p dev:gateway dev:user dev:auth dev:events dev:venue dev:mail",
     "build": "nest build",
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
     "start": "nest start",
@@ -30,6 +31,7 @@
     "test:e2e": "jest --config ./apps/e-close/test/jest-e2e.json"
   },
   "dependencies": {
+    "@nestjs-modules/mailer": "^2.0.2",
     "@nestjs/axios": "^4.0.0",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
@@ -52,6 +54,7 @@
     "kafkajs": "^2.2.4",
     "mongoose": "^8.15.1",
     "mysql2": "^3.14.1",
+    "nodemailer": "^7.0.4",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.2.2",
