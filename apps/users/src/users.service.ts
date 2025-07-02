@@ -72,6 +72,7 @@ export class UserService {
     console.log('Creating empty user profile:', user);
     const newUser = this.repo.create({
       userId: user.id,
+      username: user.username,
     });
     return await this.repo.save(newUser);
   }

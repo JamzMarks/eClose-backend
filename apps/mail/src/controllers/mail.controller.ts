@@ -1,7 +1,5 @@
 import { Body, Controller, Get, Param, Post } from "@nestjs/common";
 import { MailService } from "../services/mail.service";
-import { EventPattern } from "@nestjs/microservices";
-import { PayloadNotificationDto } from "../dto/payloadNotification.dto";
 
 interface EmailParam {
     email: string;
@@ -11,15 +9,6 @@ interface EmailParam {
 export class MailController {
     constructor( private readonly mailService: MailService){}
 
-    @EventPattern('user-created')
-    async verifyEmailNotification(user: PayloadNotificationDto): Promise<void> {
-        try {
-            await this.mailService.verifyEmailNotification(user);
-        } catch (error) {
-            console.error('Error sending notification:', error);
-        }
-    }
-
     @Post('testsend')
     async testSend(@Body() email: EmailParam): Promise<any> {  
 
@@ -28,8 +17,7 @@ export class MailController {
             return this.mailService.testSend(email.email);
         } catch (error) {
             console.error('Error in testSend:', error);
-        }
-        
+        }   
     }
 
     @Get('health')

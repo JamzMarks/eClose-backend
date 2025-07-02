@@ -25,6 +25,11 @@ export class AuthController {
     return this.authService.refreshToken(refreshToken);
   }
 
+  @Get('verify-email')
+  async verifyEmail(@Payload('token') token: string): Promise<string> {
+    return this.authService.verifyEmail(token);
+  }
+  
   @Get('health')
   getHealth() {
     return this.authService.getHealth();

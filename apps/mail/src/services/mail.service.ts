@@ -16,12 +16,14 @@ export class MailService {
     await this.mailerService.sendMail({
       to: user.email,
       subject: "Verify your email",
+      // template: 'verify-email', // 'verify-email.hbs'
       text: `Hello ${user.username}, please verify your email by clicking on the link below.`,
-      // html: `<p>Hello <strong>${user.username}</strong>,</p>
-      //        <p>Please verify your email by clicking on the link below:</p>
-      //        <a href="http://example.com/verify-email?token=${user.token}">Verify Email</a>`,
       // attachments: user.attachments?.map(attachment => ({
       //   filename: attachment.filename,
+       context: {
+        username: user.username,
+        token: user.token,
+      },
     })
   }
   async testSend(email: string): Promise<any> {

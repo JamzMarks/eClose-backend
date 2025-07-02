@@ -1,21 +1,24 @@
 import { NestFactory } from "@nestjs/core";
 import { MailModule } from "./mail.module";
+import { MicroserviceOptions, Transport } from "@nestjs/microservices";
 
 async function  bootstrap(){
     const app = await NestFactory.create(MailModule);
 
-    app.connectMicroservice({
-        transport: "KAFKA",
+    app.connectMicroservice<MicroserviceOptions>({
+        transport: Transport.KAFKA,
         options: {
-            clientId: "notifications-service",
-            brokers: ["localhost:9092"],
+            client: {
+                brokers: ["localhost:9092"],
+                clientId: "mail-service",
+            },
+            consumer: {
+                groupId: "mail-consumer-group",
+            },
         },
-        consumer: {
-            groupId: "notifications-consumer-group"
-        }
     })
-
+    await app.startAllMicroservices();
     await app.listen(process.env.PORT || 3005);
-    console.log("🚀 Notifications API HTTP rodando na porta", process.env.PORT || 3005);
+    console.log("🚀 Mail API HTTP rodando na porta", process.env.PORT || 3005);
 }
 bootstrap();

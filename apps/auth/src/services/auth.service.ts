@@ -1,13 +1,13 @@
+
 import {
-  Get,
+  BadRequestException,
   HttpException,
   HttpStatus,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { compare, hashSync } from 'bcrypt';
-import { ConfigService } from '@nestjs/config';
 import { AuthResponseDto } from '../dto/auth-response.dto';
 import { JwtPayload } from '@app/common/contracts/auth/jwt-payload.interface';
 import { CreateUserDto } from '@app/common/dtos/user/create-user.dto';
@@ -15,24 +15,18 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AuthUser } from '../repository/authUser.entity';
 import { KafkaProducerService } from './KafkaProducer.service';
+import { TokenService } from './token.service';
 
 @Injectable()
 export class AuthService {
-  private jwtExpirationTime: number;
-
   constructor(
-    private readonly kafka: KafkaProducerService,
-    private readonly jwtService: JwtService,
-    private readonly configService: ConfigService,
     @InjectRepository(AuthUser)
     private readonly repo: Repository<AuthUser>,
-  ) {
-    this.jwtExpirationTime =
-      this.configService.get<number>('JWT_EXPIRATION_TIME') || 3600;
-  }
+    private readonly kafka: KafkaProducerService,
+    private readonly tokenService: TokenService,
+  ) {}
 
   async signIn(email: string, password: string): Promise<AuthResponseDto> {
-     
     const normalizedEmail = email.trim().toLowerCase();
     const user = await this.repo.findOne({
       where: { email: normalizedEmail },
@@ -48,17 +42,13 @@ export class AuthService {
       email: user.email,
     };
 
-    const accessToken = this.jwtService.sign(payload, {
-      expiresIn: `${this.jwtExpirationTime}s`,
-    });
-    const refreshToken = this.jwtService.sign(payload, {
-      expiresIn: '7d',
-    });
+    const { accessToken, refreshToken, jwtExpirationTime } =
+      this.tokenService.getAccessAndRefreshTokens(payload);
 
     return {
       accessToken,
       refreshToken,
-      expiresIn: this.jwtExpirationTime,
+      expiresIn: jwtExpirationTime,
       user: {
         id: user.id,
         email: user.email,
@@ -95,23 +85,21 @@ export class AuthService {
       email: savedUser.email,
     };
 
-    const accessToken = this.jwtService.sign(payload, {
-      expiresIn: `${this.jwtExpirationTime}s`,
-    });
-
-    const refreshToken = this.jwtService.sign(payload, {
-      expiresIn: '7d',
-    });
+    const { accessToken, refreshToken, jwtExpirationTime } =
+      this.tokenService.getAccessAndRefreshTokens(payload);
+    const token = this.tokenService.sign(payload, '1h');
 
     await this.kafka.emit('user-created', {
       id: savedUser.id,
       email: savedUser.email,
+      token: token,
+      username: savedUser.username,
     });
-  
+
     return {
       accessToken,
       refreshToken,
-      expiresIn: this.jwtExpirationTime,
+      expiresIn: jwtExpirationTime,
       user: {
         id: savedUser.id,
         email: savedUser.email,
@@ -121,30 +109,23 @@ export class AuthService {
 
   async refreshToken(refreshToken: string): Promise<AuthResponseDto> {
     try {
-      const payload = await this.jwtService.verify<JwtPayload>(refreshToken);
+      const payload = await this.tokenService.verify<JwtPayload>(refreshToken);
 
       const user = await this.repo.findOne({ where: { id: payload.sub } });
       if (!user) {
         throw new UnauthorizedException('User no longer exists');
       }
-
       const newPayload: JwtPayload = {
         sub: user.id,
         email: user.email,
       };
 
-      const accessToken = this.jwtService.sign(newPayload, {
-        expiresIn: `${this.jwtExpirationTime}s`,
-      });
-
-      const newRefreshToken = this.jwtService.sign(newPayload, {
-        expiresIn: '7d',
-      });
+      const newTokens = this.tokenService.getAccessAndRefreshTokens(newPayload);
 
       return {
-        accessToken,
-        refreshToken: newRefreshToken,
-        expiresIn: this.jwtExpirationTime,
+        accessToken: newTokens.accessToken,
+        refreshToken: newTokens.refreshToken,
+        expiresIn: newTokens.jwtExpirationTime,
         user: {
           id: user.id,
           email: user.email,
@@ -155,14 +136,28 @@ export class AuthService {
     }
   }
 
+  async verifyEmail(token: string) {
+    try {
+      const decoded = this.tokenService.verify(token);
+      const user = await this.repo.findOneBy({ id: decoded.sub });
+
+      if (!user) throw new NotFoundException('Usuário não encontrado');
+
+      user.isVerified = true;
+      await this.repo.save(user);
+
+      return 'Email verificado com sucesso!';
+    } catch (err) {
+      throw new BadRequestException('Token inválido ou expirado');
+    }
+  }
+
   async getHealth() {
     await this.kafka.emit('created-user', {
-      
       timestamp: new Date().toISOString(),
       service: 'auth',
       status: 'ok',
     });
-
     return { status: 'ok' };
   }
 }

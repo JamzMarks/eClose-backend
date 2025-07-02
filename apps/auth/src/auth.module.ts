@@ -9,6 +9,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthUser } from './repository/authUser.entity';
 import { KafkaProducerService } from './services/KafkaProducer.service';
 import { OutboxEvent } from './repository/outBox.entity';
+import { TokenService } from './services/token.service';
 // import { KafkaProducerService } from './services/KafkaProducer.service';
 @Module({
   imports: [
@@ -66,7 +67,7 @@ import { OutboxEvent } from './repository/outBox.entity';
     TypeOrmModule.forFeature([AuthUser, OutboxEvent]),
   ],
   controllers: [AuthController],
-  providers: [AuthService, userClientProvider, KafkaProducerService],
+  providers: [AuthService, userClientProvider, KafkaProducerService, TokenService],
   exports: [],
 })
 export class AuthModule {}
